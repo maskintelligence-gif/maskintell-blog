@@ -1,24 +1,2850 @@
+# ============================================
+# Mask Intelligence Blog - Professional Edition
+# ============================================
+
+# =======================
+# 1. BACKEND & AUTH SETUP
+# =======================
 backend:
   name: github
-  repo: maskintelligence-gif/maskintell-blog  # Your actual repo
+  repo: maskintelligence-gif/maskintell-blog
   branch: main
-  base_url: https://api.netlify.com  # Netlify's OAuth endpoint
-  auth_endpoint: auth  # Netlify's auth path
+  base_url: https://api.netlify.com
+  auth_endpoint: auth
+  squash_merges: true
+  commit_messages:
+    create: "Create {{collection}} '{{slug}}'"
+    update: "Update {{collection}} '{{slug}}'"
+    delete: "Delete {{collection}} '{{slug}}'"
+    uploadMedia: "Upload '{{path}}'"
+    deleteMedia: "Delete '{{path}}'"
 
-media_folder: "static/images/uploads"  # Adjust based on your static folder
-public_folder: "/images/uploads"
+# ====================
+# 2. LOCAL DEVELOPMENT
+# ====================
+local_backend:
+  url: "http://localhost:8081/api/v1"
+  allowed_hosts: ["localhost", "127.0.0.1"]
+
+# ====================
+# 3. MEDIA MANAGEMENT
+# ====================
+media_folder: "static/media/uploads"
+public_folder: "/media/uploads"
+media_library:
+  name: uploadcare
+  config:
+    publicKey: "YOUR_UPLOADCARE_KEY"
+    multiple: true
+    previewStep: true
+    integrations:
+      cloudinary:
+        cloudName: "YOUR_CLOUDINARY_CLOUD"
+        apiKey: "YOUR_CLOUDINARY_KEY"
+        multiple: true
+
+# =================
+# 4. SITE SETTINGS
+# =================
+site_url: https://maskintelligence-gif.github.io/maskintell-blog
+# display_url: https://maskintell.com
+logo_url: "/images/logo.png"
+locale: "en_US"
+i18n:
+  structure: "multiple_folders"
+  default_locale: "en"
+  locales: ["en", "es", "fr", "de", "ja"]
+
+# ========================
+# 5. PUBLISHING WORKFLOW
+# ========================
+publish_mode: editorial_workflow
+editorial_workflow:
+  steps:
+    - { label: "Draft", name: "draft" }
+    - { label: "In Review", name: "in_review" }
+    - { label: "Approved", name: "approved" }
+    - { label: "Ready", name: "ready" }
+    - { label: "Published", name: "published" }
+    - { label: "Scheduled", name: "scheduled" }
+    - { label: "Archived", name: "archived" }
+
+# =====================
+# 6. SEARCH & SORTING
+# =====================
+search: true
+sortable_fields: 
+  - "title"
+  - "date"
+  - "updated_date"
+  - "author"
+  - "priority"
+  - "views"
+  - "reading_time"
+
+# ============================================
+# 7. ADVANCED COLLECTIONS
+# ============================================
 
 collections:
+  
+  # ====================
+  # 7.1 BLOG ENHANCEMENTS
+  # ====================
   - name: "posts"
     label: "Blog Posts"
+    label_singular: "Blog Post"
     folder: "content/posts"
     create: true
+    nested:
+      depth: 3
+      summary: "{{title}}"
+    meta: { path: { widget: "string", label: "Path", index_file: "index" } }
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    preview_path: "blog/{{slug}}"
+    
+    # Enhanced editorial workflow
+    publish: true
+    sortable_fields: ['title', 'date', 'author', 'status', 'category', 'priority']
+    
+    # Advanced filtering
+    view_filters:
+      - { label: "Drafts", field: "status", pattern: "draft" }
+      - { label: "In Review", field: "status", pattern: "in_review" }
+      - { label: "Published", field: "status", pattern: "published" }
+      - { label: "Scheduled", field: "status", pattern: "scheduled" }
+      - { label: "Archived", field: "status", pattern: "archived" }
+      - { label: "Featured", field: "featured", pattern: "true" }
+      - { label: "High Priority", field: "priority", pattern: "high" }
+      - { label: "Needs SEO", field: "seo_status", pattern: "needs_review" }
+    
+    # Grouping options
+    view_groups:
+      - { label: "By Year", field: "date", pattern: "\\d{4}" }
+      - { label: "By Category", field: "category" }
+      - { label: "By Status", field: "status" }
+      - { label: "By Author", field: "author" }
+      - { label: "By Priority", field: "priority" }
+    
+    # Summary with more info
+    summary: "{{title}} - {{date}} | 👁 {{views}} | ⏱ {{reading_time}}min | 📊 {{seo_score}}"
+    
+    # Fields with advanced widgets
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Publish Date", name: "date", widget: "datetime" }
-      - { label: "Author", name: "author", widget: "string" }
-      - { label: "Category", name: "category", widget: "string", required: false }
-      - { label: "Tags", name: "tags", widget: "list", required: false }
-      - { label: "Featured Image", name: "thumbnail", widget: "image", required: false }
-      - { label: "Body", name: "body", widget: "markdown" }
+      
+      # Basic Info
+      - { label: "Title", name: "title", widget: "string", required: true }
+      - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+      
+      # URL & Slug Management
+      - { 
+          label: "Custom Slug", 
+          name: "slug", 
+          widget: "string", 
+          required: false,
+          hint: "Auto-generated from title if empty",
+          pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Must be lowercase with hyphens']
+        }
+      - { 
+          label: "URL Aliases", 
+          name: "aliases", 
+          widget: "list", 
+          required: false,
+          hint: "Alternative URLs that redirect to this post"
+        }
+      
+      # Dates & Scheduling
+      - { 
+          label: "Publish Date & Time", 
+          name: "date", 
+          widget: "datetime",
+          required: true,
+          date_format: "DD/MM/YYYY",
+          time_format: "HH:mm",
+          format: "YYYY-MM-DD HH:mm"
+        }
+      - { 
+          label: "Updated Date", 
+          name: "updated_date", 
+          widget: "datetime",
+          required: false,
+          hint: "Last content update"
+        }
+      - { 
+          label: "Expiry Date", 
+          name: "expiry_date", 
+          widget: "datetime",
+          required: false,
+          hint: "Auto-archive after this date"
+        }
+      
+      # Authorship & Ownership
+      - { 
+          label: "Primary Author", 
+          name: "author", 
+          widget: "relation",
+          collection: "team",
+          search_fields: ["name", "email"],
+          value_field: "id",
+          display_fields: ["name"],
+          required: true
+        }
+      - { 
+          label: "Co-Authors", 
+          name: "co_authors", 
+          widget: "relation",
+          collection: "team",
+          multiple: true,
+          required: false
+        }
+      - { 
+          label: "Content Owner", 
+          name: "owner", 
+          widget: "relation",
+          collection: "team",
+          value_field: "id",
+          display_fields: ["name", "position"],
+          required: false
+        }
+      - { 
+          label: "Reviewer", 
+          name: "reviewer", 
+          widget: "relation",
+          collection: "team",
+          value_field: "id",
+          display_fields: ["name"],
+          required: false
+        }
+      
+      # Status & Workflow
+      - { 
+          label: "Status", 
+          name: "status", 
+          widget: "select", 
+          options: 
+            - { label: "✍️ Draft", value: "draft" }
+            - { label: "👁️ In Review", value: "in_review" }
+            - { label: "✅ Approved", value: "approved" }
+            - { label: "🚀 Ready to Publish", value: "ready" }
+            - { label: "📢 Published", value: "published" }
+            - { label: "⏰ Scheduled", value: "scheduled" }
+            - { label: "📁 Archived", value: "archived" }
+          default: "draft"
+        }
+      - { 
+          label: "Priority", 
+          name: "priority", 
+          widget: "select",
+          options: 
+            - { label: "⭐ High", value: "high" }
+            - { label: "🔶 Medium", value: "medium" }
+            - { label: "🔷 Low", value: "low" }
+          default: "medium"
+        }
+      - { 
+          label: "Content Type", 
+          name: "content_type", 
+          widget: "select",
+          options: 
+            - { label: "📝 Article", value: "article" }
+            - { label: "🎯 Tutorial", value: "tutorial" }
+            - { label: "📊 Case Study", value: "case_study" }
+            - { label: "📰 News", value: "news" }
+            - { label: "🎥 Video", value: "video" }
+            - { label: "🎙️ Podcast", value: "podcast" }
+            - { label: "📚 E-book", value: "ebook" }
+          default: "article"
+        }
+      
+      # Taxonomy & Organization
+      - { 
+          label: "Main Category", 
+          name: "category", 
+          widget: "relation",
+          collection: "categories",
+          search_fields: ["title"],
+          value_field: "slug",
+          display_fields: ["title"],
+          required: true
+        }
+      - { 
+          label: "Subcategories", 
+          name: "subcategories", 
+          widget: "relation",
+          collection: "categories",
+          multiple: true,
+          value_field: "slug",
+          display_fields: ["title"],
+          required: false
+        }
+      - { 
+          label: "Tags", 
+          name: "tags", 
+          widget: "select",
+          multiple: true,
+          min: 0,
+          max: 10,
+          options: "{{tags_collection}}",
+          create: true,
+          hint: "Select existing or create new tags"
+        }
+      
+      # Content Series
+      - { 
+          label: "Part of Series", 
+          name: "series", 
+          widget: "relation",
+          collection: "series",
+          search_fields: ["title"],
+          value_field: "slug",
+          display_fields: ["title"],
+          required: false
+        }
+      - { 
+          label: "Series Position", 
+          name: "series_position", 
+          widget: "number",
+          value_type: "int",
+          min: 1,
+          max: 100,
+          required: false,
+          hint: "Position in the series (1, 2, 3...)"
+        }
+      
+      # Media & Visuals
+      - { 
+          label: "Featured Image", 
+          name: "thumbnail", 
+          widget: "image",
+          required: true,
+          media_library: { config: { multiple: false } },
+          hint: "1200x630px recommended for social sharing"
+        }
+      - { 
+          label: "Image Variants", 
+          name: "image_variants", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "Mobile Optimized", name: "mobile", widget: "image", required: false }
+            - { label: "Tablet Optimized", name: "tablet", widget: "image", required: false }
+            - { label: "Social Sharing", name: "social", widget: "image", required: false }
+        }
+      - { 
+          label: "Image Metadata", 
+          name: "image_metadata", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "Alt Text", name: "alt", widget: "string", required: true }
+            - { label: "Caption", name: "caption", widget: "string", required: false }
+            - { label: "Credits", name: "credits", widget: "string", required: false }
+            - { label: "License", name: "license", widget: "string", required: false }
+        }
+      - { 
+          label: "Video Embeds", 
+          name: "videos", 
+          widget: "list",
+          required: false,
+          fields: 
+            - { label: "Video Title", name: "title", widget: "string" }
+            - { label: "URL", name: "url", widget: "string" }
+            - { label: "Platform", name: "platform", widget: "select", options: ["youtube", "vimeo", "custom"] }
+            - { label: "Thumbnail", name: "thumbnail", widget: "image", required: false }
+            - { label: "Start Time", name: "start_time", widget: "string", required: false }
+        }
+      - { 
+          label: "Gallery", 
+          name: "gallery", 
+          widget: "list",
+          required: false,
+          field: { label: "Image", name: "image", widget: "image" }
+        }
+      
+      # Content
+      - { 
+          label: "Excerpt", 
+          name: "excerpt", 
+          widget: "text",
+          required: true,
+          hint: "150-160 characters for meta description"
+        }
+      - { 
+          label: "Summary", 
+          name: "summary", 
+          widget: "markdown",
+          required: false,
+          hint: "Extended summary for listings"
+        }
+      - { 
+          label: "Body Content", 
+          name: "body", 
+          widget: "markdown",
+          required: true,
+          buttons: 
+            - "bold"
+            - "italic"
+            - "code"
+            - "link"
+            - "heading-one"
+            - "heading-two"
+            - "heading-three"
+            - "heading-four"
+            - "heading-five"
+            - "heading-six"
+            - "quote"
+            - "bulleted-list"
+            - "numbered-list"
+            - "table"
+            - "image"
+            - "code-block"
+          editor_components: 
+            - "youtube-embed"
+            - "twitter-embed"
+            - "codepen-embed"
+            - "table-of-contents"
+            - "callout"
+            - "quiz"
+            - "poll"
+        }
+      
+      # Table of Contents
+      - { 
+          label: "Generate TOC", 
+          name: "generate_toc", 
+          widget: "boolean",
+          default: true,
+          hint: "Auto-generate table of contents"
+        }
+      - { 
+          label: "TOC Depth", 
+          name: "toc_depth", 
+          widget: "number",
+          value_type: "int",
+          min: 2,
+          max: 6,
+          default: 3,
+          required: false
+        }
+      
+      # Content Blocks (Modular)
+      - { 
+          label: "Content Blocks", 
+          name: "blocks", 
+          widget: "list",
+          types: 
+            - { 
+                label: "Call to Action", 
+                name: "cta",
+                widget: "object",
+                fields: 
+                  - { label: "Title", name: "title", widget: "string" }
+                  - { label: "Text", name: "text", widget: "text" }
+                  - { label: "Button Text", name: "button_text", widget: "string" }
+                  - { label: "Button Link", name: "button_link", widget: "string" }
+                  - { label: "Background Color", name: "bg_color", widget: "color", default: "#f0f0f0" }
+              }
+            - { 
+                label: "Code Example", 
+                name: "code",
+                widget: "object",
+                fields: 
+                  - { label: "Title", name: "title", widget: "string" }
+                  - { label: "Language", name: "language", widget: "select", options: ["javascript", "python", "html", "css", "bash", "json"] }
+                  - { label: "Code", name: "code", widget: "code", default_language: "javascript" }
+              }
+            - { 
+                label: "Quote", 
+                name: "quote",
+                widget: "object",
+                fields: 
+                  - { label: "Text", name: "text", widget: "text" }
+                  - { label: "Author", name: "author", widget: "string" }
+                  - { label: "Source", name: "source", widget: "string", required: false }
+              }
+          required: false
+        }
+      
+      # SEO Advanced
+      - { 
+          label: "SEO Configuration", 
+          name: "seo", 
+          widget: "object",
+          collapsed: true,
+          summary: "{{fields.meta_title}} - Score: {{fields.seo_score}}/100",
+          fields: 
+            - { label: "Meta Title", name: "meta_title", widget: "string", required: false, hint: "60 characters max", pattern: [".{0,60}", "Max 60 characters"] }
+            - { label: "Meta Description", name: "meta_description", widget: "text", required: false, hint: "155-160 characters", pattern: [".{0,160}", "Max 160 characters"] }
+            - { label: "Focus Keyword", name: "focus_keyword", widget: "string", required: false }
+            - { label: "Secondary Keywords", name: "secondary_keywords", widget: "list", required: false }
+            - { label: "SEO Title", name: "seo_title", widget: "string", required: false }
+            - { label: "SEO Description", name: "seo_description", widget: "text", required: false }
+            - { label: "SEO Score", name: "seo_score", widget: "number", value_type: "int", min: 0, max: 100, default: 0 }
+            - { label: "SEO Status", name: "seo_status", widget: "select", options: ["not_reviewed", "needs_review", "optimized", "needs_improvement"], default: "not_reviewed" }
+            - { label: "Readability Score", name: "readability_score", widget: "number", value_type: "int", min: 0, max: 100, default: 0 }
+            - { label: "Word Count", name: "word_count", widget: "number", value_type: "int", default: 0 }
+            - { label: "Schema Type", name: "schema_type", widget: "select", options: ["Article", "BlogPosting", "NewsArticle", "TechArticle", "Recipe", "Course"] }
+            - { label: "Canonical URL", name: "canonical", widget: "string", required: false }
+            - { label: "No Index", name: "noindex", widget: "boolean", default: false }
+            - { label: "No Follow", name: "nofollow", widget: "boolean", default: false }
+            - { label: "Open Graph Image", name: "og_image", widget: "image", required: false }
+            - { label: "Twitter Card Image", name: "twitter_image", widget: "image", required: false }
+            - { 
+                label: "Structured Data", 
+                name: "structured_data", 
+                widget: "object",
+                collapsed: true,
+                fields: 
+                  - { label: "Author Name", name: "author_name", widget: "string" }
+                  - { label: "Publisher Name", name: "publisher_name", widget: "string" }
+                  - { label: "Publisher Logo", name: "publisher_logo", widget: "image" }
+                  - { label: "Date Modified", name: "date_modified", widget: "datetime" }
+                  - { label: "Date Published", name: "date_published", widget: "datetime" }
+              }
+        }
+      
+      # Social Sharing
+      - { 
+          label: "Social Media", 
+          name: "social_media", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "Custom Tweet", name: "tweet", widget: "text", required: false, hint: "Custom message for Twitter sharing" }
+            - { label: "LinkedIn Summary", name: "linkedin_summary", widget: "text", required: false }
+            - { label: "Facebook Caption", name: "facebook_caption", widget: "text", required: false }
+            - { label: "Hashtags", name: "hashtags", widget: "list", required: false }
+            - { label: "Auto-share to Social", name: "auto_share", widget: "boolean", default: false }
+            - { 
+                label: "Social Platforms", 
+                name: "platforms", 
+                widget: "select",
+                multiple: true,
+                options: ["twitter", "linkedin", "facebook", "instagram", "pinterest"]
+              }
+        }
+      
+      # Performance & Analytics
+      - { 
+          label: "Performance Metrics", 
+          name: "performance", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "Reading Time (minutes)", name: "reading_time", widget: "number", value_type: "int", default: 0 }
+            - { label: "Page Views", name: "views", widget: "number", value_type: "int", default: 0 }
+            - { label: "Unique Visitors", name: "unique_visitors", widget: "number", value_type: "int", default: 0 }
+            - { label: "Average Time on Page", name: "avg_time", widget: "number", value_type: "float", default: 0 }
+            - { label: "Bounce Rate", name: "bounce_rate", widget: "number", value_type: "float", default: 0, min: 0, max: 100 }
+            - { label: "Conversion Rate", name: "conversion_rate", widget: "number", value_type: "float", default: 0, min: 0, max: 100 }
+            - { label: "Last Analytics Update", name: "analytics_updated", widget: "datetime", required: false }
+        }
+      
+      # Related Content
+      - { 
+          label: "Related Posts", 
+          name: "related_posts", 
+          widget: "relation",
+          collection: "posts",
+          search_fields: ["title", "tags"],
+          value_field: "slug",
+          display_fields: ["title"],
+          multiple: true,
+          required: false,
+          hint: "Manually select or leave empty for auto-suggestion"
+        }
+      - { 
+          label: "Related Products", 
+          name: "related_products", 
+          widget: "relation",
+          collection: "products",
+          multiple: true,
+          required: false
+        }
+      - { 
+          label: "Related Services", 
+          name: "related_services", 
+          widget: "relation",
+          collection: "services",
+          multiple: true,
+          required: false
+        }
+      
+      # User Engagement
+      - { 
+          label: "Engagement Features", 
+          name: "engagement", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "Allow Comments", name: "allow_comments", widget: "boolean", default: true }
+            - { label: "Enable Reactions", name: "enable_reactions", widget: "boolean", default: true }
+            - { label: "Show Share Buttons", name: "show_share", widget: "boolean", default: true }
+            - { label: "Enable Print", name: "enable_print", widget: "boolean", default: true }
+            - { label: "Show Progress Bar", name: "show_progress", widget: "boolean", default: true }
+            - { label: "Email Subscribe", name: "email_subscribe", widget: "boolean", default: true }
+            - { label: "Newsletter CTA", name: "newsletter_cta", widget: "text", required: false }
+        }
+      
+      # A/B Testing
+      - { 
+          label: "A/B Testing", 
+          name: "ab_testing", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "Enable A/B Test", name: "enabled", widget: "boolean", default: false }
+            - { label: "Test ID", name: "test_id", widget: "string", required: false }
+            - { label: "Variation A Title", name: "variation_a_title", widget: "string", required: false }
+            - { label: "Variation B Title", name: "variation_b_title", widget: "string", required: false }
+            - { label: "Test Duration (days)", name: "duration", widget: "number", value_type: "int", default: 7 }
+            - { label: "Success Metric", name: "success_metric", widget: "select", options: ["clicks", "conversions", "time_on_page", "scroll_depth"], default: "clicks" }
+        }
+      
+      # Accessibility
+      - { 
+          label: "Accessibility", 
+          name: "accessibility", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "Alt Text Complete", name: "alt_complete", widget: "boolean", default: false }
+            - { label: "Color Contrast Check", name: "color_contrast", widget: "select", options: ["pass", "fail", "not_checked"], default: "not_checked" }
+            - { label: "Screen Reader Optimized", name: "screen_reader", widget: "boolean", default: false }
+            - { label: "Keyboard Navigation", name: "keyboard_nav", widget: "boolean", default: true }
+            - { label: "ARIA Labels", name: "aria_labels", widget: "text", required: false }
+        }
+      
+      # GDPR & Compliance
+      - { 
+          label: "Compliance", 
+          name: "compliance", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "GDPR Compliant", name: "gdpr", widget: "boolean", default: true }
+            - { label: "Cookie Consent Required", name: "cookie_consent", widget: "boolean", default: true }
+            - { label: "Age Restriction", name: "age_restriction", widget: "select", options: ["none", "13+", "16+", "18+", "21+"], default: "none" }
+            - { label: "Privacy Level", name: "privacy_level", widget: "select", options: ["public", "private", "confidential"], default: "public" }
+            - { label: "Data Retention Period (months)", name: "retention_period", widget: "number", value_type: "int", default: 24 }
+        }
+      
+      # Technical
+      - { 
+          label: "Technical Settings", 
+          name: "technical", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "Custom CSS", name: "custom_css", widget: "code", default_language: "css", required: false }
+            - { label: "Custom JS", name: "custom_js", widget: "code", default_language: "javascript", required: false }
+            - { label: "Cache TTL (seconds)", name: "cache_ttl", widget: "number", value_type: "int", default: 3600 }
+            - { label: "CDN Purge", name: "cdn_purge", widget: "boolean", default: true }
+            - { label: "Prefetch Links", name: "prefetch", widget: "boolean", default: true }
+            - { label: "Lazy Load Images", name: "lazy_load", widget: "boolean", default: true }
+        }
+      
+      # Automation
+      - { 
+          label: "Automation Rules", 
+          name: "automation", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "Auto-tag", name: "auto_tag", widget: "boolean", default: true }
+            - { label: "Auto-categorize", name: "auto_categorize", widget: "boolean", default: true }
+            - { label: "Auto-generate Excerpt", name: "auto_excerpt", widget: "boolean", default: true }
+            - { label: "Auto-suggest Related", name: "auto_related", widget: "boolean", default: true }
+            - { label: "Auto-share on Publish", name: "auto_share_publish", widget: "boolean", default: false }
+            - { label: "Auto-archive after", name: "auto_archive_days", widget: "number", value_type: "int", default: 365 }
+        }
+      
+      # Versioning
+      - { 
+          label: "Version Control", 
+          name: "version", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "Version Number", name: "number", widget: "string", default: "1.0.0" }
+            - { label: "Changelog", name: "changelog", widget: "text", required: false }
+            - { label: "Previous Version", name: "previous_version", widget: "string", required: false }
+            - { label: "Breaking Changes", name: "breaking_changes", widget: "boolean", default: false }
+        }
+      
+      # Featured & Promotional
+      - { label: "Featured Post", name: "featured", widget: "boolean", default: false }
+      - { label: "Featured on Homepage", name: "featured_homepage", widget: "boolean", default: false }
+      - { label: "Featured in Category", name: "featured_category", widget: "boolean", default: false }
+      - { label: "Promotion Start", name: "promotion_start", widget: "datetime", required: false }
+      - { label: "Promotion End", name: "promotion_end", widget: "datetime", required: false }
+      - { label: "Promotion Channel", name: "promotion_channel", widget: "select", multiple: true, options: ["email", "social", "newsletter", "ads", "push"] }
+      
+      # Auditing
+      - { 
+          label: "Audit Trail", 
+          name: "audit", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "Created By", name: "created_by", widget: "string", default: "system" }
+            - { label: "Created At", name: "created_at", widget: "datetime", default: "now" }
+            - { label: "Updated By", name: "updated_by", widget: "string", required: false }
+            - { label: "Updated At", name: "updated_at", widget: "datetime", required: false }
+            - { label: "Published By", name: "published_by", widget: "string", required: false }
+            - { label: "Published At", name: "published_at", widget: "datetime", required: false }
+            - { label: "Review Count", name: "review_count", widget: "number", value_type: "int", default: 0 }
+        }
+      
+      # Custom Fields
+      - { 
+          label: "Custom Metadata", 
+          name: "custom_metadata", 
+          widget: "object",
+          collapsed: true,
+          fields: 
+            - { label: "Key", name: "key", widget: "string" }
+            - { label: "Value", name: "value", widget: "string" }
+        }
+
+       # ========================
+# 7.2 CATEGORIES & TAXONOMY
+# ========================
+- name: "categories"
+  label: "Categories"
+  label_singular: "Category"
+  folder: "content/categories"
+  create: true
+  identifier_field: "slug"
+  summary: "{{title}} ({{posts_count}} posts)"
+  
+  fields:
+    - { label: "Title", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Description", name: "description", widget: "text", required: true }
+    - { label: "Parent Category", name: "parent", widget: "relation", collection: "categories", required: false }
+    - { label: "Featured Image", name: "image", widget: "image", required: false }
+    - { label: "Icon", name: "icon", widget: "string", required: false }
+    - { label: "Color", name: "color", widget: "color", default: "#3B82F6" }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+    - { label: "Show in Navigation", name: "show_in_nav", widget: "boolean", default: true }
+    - { label: "SEO Title", name: "seo_title", widget: "string", required: false }
+    - { label: "SEO Description", name: "seo_description", widget: "text", required: false }
+    - { 
+        label: "Automation", 
+        name: "automation", 
+        widget: "object",
+        collapsed: true,
+        fields: 
+          - { label: "Auto-assign based on keywords", name: "auto_keywords", widget: "list", required: false }
+          - { label: "Default for new posts", name: "default_for_new", widget: "boolean", default: false }
+      }
+    - { label: "Posts Count", name: "posts_count", widget: "hidden", default: 0 }
+
+# =================
+# 7.3 TAGS MANAGER
+# =================
+- name: "tags"
+  label: "Tags"
+  label_singular: "Tag"
+  folder: "content/tags"
+  create: true
+  slug: "{{slug}}"
+  
+  fields:
+    - { label: "Tag Name", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Description", name: "description", widget: "text", required: false }
+    - { label: "Related Tags", name: "related_tags", widget: "relation", collection: "tags", multiple: true }
+    - { label: "Usage Count", name: "usage_count", widget: "number", default: 0 }
+    - { label: "Popularity Score", name: "popularity", widget: "number", default: 0 }
+    - { label: "Last Used", name: "last_used", widget: "datetime", required: false }
+    - { label: "Color", name: "color", widget: "color", default: "#6B7280" }
+
+# ==================
+# 7.4 CONTENT SERIES
+# ==================
+- name: "series"
+  label: "Content Series"
+  label_singular: "Series"
+  folder: "content/series"
+  create: true
+  
+  fields:
+    - { label: "Series Title", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Description", name: "description", widget: "markdown", required: true }
+    - { label: "Cover Image", name: "cover_image", widget: "image", required: true }
+    - { label: "Total Episodes", name: "total_episodes", widget: "number", default: 1 }
+    - { label: "Status", name: "status", widget: "select", options: ["ongoing", "completed", "planned"], default: "ongoing" }
+    - { label: "Difficulty Level", name: "difficulty", widget: "select", options: ["beginner", "intermediate", "advanced"], default: "beginner" }
+    - { 
+        label: "Episodes", 
+        name: "episodes", 
+        widget: "list",
+        fields: 
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Post", name: "post", widget: "relation", collection: "posts" }
+          - { label: "Episode Number", name: "episode_number", widget: "number" }
+          - { label: "Release Date", name: "release_date", widget: "datetime" }
+      }
+    - { label: "Prerequisites", name: "prerequisites", widget: "list", required: false }
+
+# =======================
+# 7.5 PAGES COLLECTION
+# =======================
+- name: "pages"
+  label: "Pages"
+  label_singular: "Page"
+  folder: "content/pages"
+  create: true
+  nested:
+    depth: 10
+    summary: "{{title}}"
+  
+  fields:
+    - { label: "Title", name: "title", widget: "string", required: true }
+    - { label: "Page ID", name: "page_id", widget: "string", required: true, pattern: ['^[a-z0-9\\-]+$', 'Lowercase letters, numbers, and hyphens only'] }
+    - { label: "Parent Page", name: "parent", widget: "relation", collection: "pages", required: false }
+    - { label: "Navigation Title", name: "nav_title", widget: "string", required: false }
+    - { label: "Permalink", name: "permalink", widget: "string", required: true, hint: "Auto-generated if empty based on hierarchy" }
+    - { label: "Template", name: "template", widget: "select", options: ["default", "homepage", "contact", "landing", "fullwidth", "sidebar"], default: "default" }
+    - { label: "Layout", name: "layout", widget: "select", options: ["standard", "hero", "centered", "magazine"], default: "standard" }
+    - { label: "Meta Description", name: "meta_description", widget: "text", required: true }
+    - { label: "Hero Section", name: "hero", widget: "object", collapsed: true,
+        fields: 
+          - { label: "Show Hero", name: "enabled", widget: "boolean", default: true }
+          - { label: "Hero Title", name: "title", widget: "string", required: false }
+          - { label: "Hero Subtitle", name: "subtitle", widget: "text", required: false }
+          - { label: "Hero Image", name: "image", widget: "image", required: false }
+          - { label: "Hero Video", name: "video", widget: "file", required: false }
+          - { label: "Call to Action", name: "cta", widget: "object",
+              fields: 
+                - { label: "Text", name: "text", widget: "string" }
+                - { label: "Link", name: "link", widget: "string" }
+                - { label: "Style", name: "style", widget: "select", options: ["primary", "secondary", "outline"] }
+            }
+        ]
+      }
+    - { label: "Body Content", name: "body", widget: "markdown", required: false }
+    - { 
+        label: "Page Builder", 
+        name: "sections", 
+        widget: "list",
+        types: 
+          - { 
+              label: "Content Section", 
+              name: "content",
+              widget: "object",
+              fields: 
+                - { label: "Title", name: "title", widget: "string" }
+                - { label: "Content", name: "content", widget: "markdown" }
+                - { label: "Background Color", name: "bg_color", widget: "color" }
+                - { label: "Text Color", name: "text_color", widget: "color" }
+            }
+          - { 
+              label: "Features Grid", 
+              name: "features",
+              widget: "object",
+              fields: 
+                - { label: "Title", name: "title", widget: "string" }
+                - { label: "Subtitle", name: "subtitle", widget: "text" }
+                - { 
+                    label: "Features", 
+                    name: "items", 
+                    widget: "list",
+                    fields: 
+                      - { label: "Icon", name: "icon", widget: "string" }
+                      - { label: "Title", name: "title", widget: "string" }
+                      - { label: "Description", name: "description", widget: "text" }
+                      - { label: "Link", name: "link", widget: "string", required: false }
+                  }
+            }
+          - { 
+              label: "Team Members", 
+              name: "team",
+              widget: "object",
+              fields: 
+                - { label: "Title", name: "title", widget: "string" }
+                - { label: "Subtitle", name: "subtitle", widget: "text" }
+                - { label: "Team Members", name: "members", widget: "relation", collection: "team", multiple: true }
+            }
+          - { 
+              label: "Testimonials", 
+              name: "testimonials",
+              widget: "object",
+              fields: 
+                - { label: "Title", name: "title", widget: "string" }
+                - { label: "Testimonials", name: "items", widget: "relation", collection: "testimonials", multiple: true }
+            }
+          - { 
+              label: "Contact Form", 
+              name: "contact_form",
+              widget: "object",
+              fields: 
+                - { label: "Title", name: "title", widget: "string" }
+                - { label: "Subtitle", name: "subtitle", widget: "text" }
+                - { 
+                    label: "Form Fields", 
+                    name: "fields", 
+                    widget: "list",
+                    fields: 
+                      - { label: "Field Type", name: "type", widget: "select", options: ["text", "email", "textarea", "select", "checkbox"] }
+                      - { label: "Label", name: "label", widget: "string" }
+                      - { label: "Required", name: "required", widget: "boolean", default: false }
+                      - { label: "Placeholder", name: "placeholder", widget: "string", required: false }
+                  }
+            }
+        ],
+        required: false
+      }
+    - { label: "Sidebar Content", name: "sidebar", widget: "markdown", required: false }
+    - { label: "Show in Navigation", name: "show_in_nav", widget: "boolean", default: true }
+    - { label: "Show in Footer", name: "show_in_footer", widget: "boolean", default: false }
+    - { label: "Navigation Order", name: "nav_order", widget: "number", default: 0 }
+    - { label: "Requires Authentication", name: "requires_auth", widget: "boolean", default: false }
+    - { label: "Access Level", name: "access_level", widget: "select", options: ["public", "subscriber", "premium", "admin"], default: "public" }
+    - { 
+        label: "SEO Settings", 
+        name: "seo", 
+        widget: "object",
+        collapsed: true,
+        fields: 
+          - { label: "Meta Title", name: "meta_title", widget: "string" }
+          - { label: "Meta Description", name: "meta_description", widget: "text" }
+          - { label: "Open Graph Image", name: "og_image", widget: "image" }
+          - { label: "Canonical URL", name: "canonical", widget: "string", required: false }
+          - { label: "No Index", name: "noindex", widget: "boolean", default: false }
+      }
+    - { 
+        label: "Page Settings", 
+        name: "settings", 
+        widget: "object",
+        collapsed: true,
+        fields: 
+          - { label: "Show Breadcrumbs", name: "show_breadcrumbs", widget: "boolean", default: true }
+          - { label: "Show Title", name: "show_title", widget: "boolean", default: true }
+          - { label: "Show Last Updated", name: "show_updated", widget: "boolean", default: false }
+          - { label: "Show Table of Contents", name: "show_toc", widget: "boolean", default: false }
+          - { label: "Comments Enabled", name: "comments_enabled", widget: "boolean", default: false }
+          - { label: "Show Related Content", name: "show_related", widget: "boolean", default: false }
+      }
+    - { 
+        label: "Custom Code", 
+        name: "custom_code", 
+        widget: "object",
+        collapsed: true,
+        fields: 
+          - { label: "Custom CSS", name: "css", widget: "code", default_language: "css" }
+          - { label: "Custom JavaScript", name: "js", widget: "code", default_language: "javascript" }
+          - { label: "Header Scripts", name: "header_scripts", widget: "code", default_language: "html" }
+          - { label: "Footer Scripts", name: "footer_scripts", widget: "code", default_language: "html" }
+      }
+    - { 
+        label: "Page Analytics", 
+        name: "analytics", 
+        widget: "object",
+        collapsed: true,
+        fields: 
+          - { label: "Google Analytics ID", name: "ga_id", widget: "string", required: false }
+          - { label: "Track Page Views", name: "track_views", widget: "boolean", default: true }
+          - { label: "Conversion Tracking", name: "conversion_tracking", widget: "text", required: false }
+      }
+    - { label: "Published", name: "published", widget: "boolean", default: true }
+    - { label: "Publish Date", name: "publish_date", widget: "datetime", required: false }
+    - { label: "Last Modified", name: "last_modified", widget: "datetime", required: false }
+
+# =======================
+# 7.6 SERVICES COLLECTION
+# =======================
+- name: "services"
+  label: "Services"
+  label_singular: "Service"
+  folder: "content/services"
+  create: true
+  slug: "{{slug}}"
+  summary: "{{title}} - Starting at ${{price}}"
+  
+  fields:
+    - { label: "Service Name", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Tagline", name: "tagline", widget: "string", required: true }
+    - { label: "Service Icon", name: "icon", widget: "select", 
+        options: 
+          - { label: "🖥️ Web Development", value: "web-dev" }
+          - { label: "📱 Mobile Apps", value: "mobile" }
+          - { label: "🤖 AI Solutions", value: "ai" }
+          - { label: "☁️ Cloud Services", value: "cloud" }
+          - { label: "🎨 UI/UX Design", value: "design" }
+          - { label: "🔧 Maintenance", value: "maintenance" }
+      }
+    - { label: "Service Category", name: "category", widget: "relation", collection: "service_categories", required: true }
+    - { label: "Featured Image", name: "image", widget: "image", required: true }
+    - { label: "Short Description", name: "short_description", widget: "text", required: true }
+    - { label: "Detailed Description", name: "description", widget: "markdown", required: true }
+    - { label: "Service Type", name: "service_type", widget: "select", options: ["one-time", "subscription", "consultation", "package"], default: "one-time" }
+    - { label: "Price Starting From", name: "price", widget: "number", value_type: "float", min: 0, required: false }
+    - { label: "Currency", name: "currency", widget: "select", options: ["USD", "EUR", "GBP", "CAD", "AUD"], default: "USD" }
+    - { label: "Pricing Model", name: "pricing_model", widget: "select", options: ["hourly", "project", "monthly", "annual"], default: "project" }
+    - { 
+        label: "Pricing Tiers", 
+        name: "pricing_tiers", 
+        widget: "list",
+        required: false,
+        fields: 
+          - { label: "Tier Name", name: "name", widget: "string" }
+          - { label: "Price", name: "price", widget: "number", value_type: "float" }
+          - { label: "Billing Cycle", name: "billing_cycle", widget: "select", options: ["one-time", "monthly", "quarterly", "annual"] }
+          - { label: "Features Included", name: "features", widget: "list" }
+          - { label: "Most Popular", name: "popular", widget: "boolean", default: false }
+      }
+    - { 
+        label: "Features", 
+        name: "features", 
+        widget: "list",
+        fields: 
+          - { label: "Feature", name: "feature", widget: "string" }
+          - { label: "Description", name: "description", widget: "text", required: false }
+          - { label: "Icon", name: "icon", widget: "string", required: false }
+      }
+    - { 
+        label: "Deliverables", 
+        name: "deliverables", 
+        widget: "list",
+        fields: 
+          - { label: "Item", name: "item", widget: "string" }
+          - { label: "Quantity", name: "quantity", widget: "number", default: 1 }
+          - { label: "Timeline", name: "timeline", widget: "string", hint: "e.g., 2 weeks" }
+      }
+    - { label: "Timeline", name: "timeline", widget: "string", required: false, hint: "e.g., 4-6 weeks" }
+    - { 
+        label: "Technologies", 
+        name: "technologies", 
+        widget: "list",
+        fields: 
+          - { label: "Technology", name: "name", widget: "string" }
+          - { label: "Icon", name: "icon", widget: "string", required: false }
+          - { label: "Proficiency", name: "proficiency", widget: "select", options: ["expert", "advanced", "intermediate", "basic"] }
+      }
+    - { label: "Case Studies", name: "case_studies", widget: "relation", collection: "portfolio", multiple: true }
+    - { 
+        label: "FAQ", 
+        name: "faq", 
+        widget: "list",
+        fields: 
+          - { label: "Question", name: "question", widget: "string" }
+          - { label: "Answer", name: "answer", widget: "text" }
+      }
+    - { 
+        label: "Call to Action", 
+        name: "cta", 
+        widget: "object",
+        fields: 
+          - { label: "Button Text", name: "text", widget: "string", default: "Get Started" }
+          - { label: "Button Link", name: "link", widget: "string", default: "/contact" }
+          - { label: "Button Style", name: "style", widget: "select", options: ["primary", "secondary", "outline"], default: "primary" }
+          - { label: "Show Contact Form", name: "show_form", widget: "boolean", default: true }
+      }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+    - { label: "Featured Service", name: "featured", widget: "boolean", default: false }
+    - { label: "Show on Homepage", name: "show_on_homepage", widget: "boolean", default: false }
+    - { label: "Active", name: "active", widget: "boolean", default: true }
+    - { 
+        label: "SEO", 
+        name: "seo", 
+        widget: "object",
+        fields: 
+          - { label: "Meta Title", name: "meta_title", widget: "string" }
+          - { label: "Meta Description", name: "meta_description", widget: "text" }
+          - { label: "Keywords", name: "keywords", widget: "list" }
+      }
+
+# =======================
+# 7.7 SERVICE CATEGORIES
+# =======================
+- name: "service_categories"
+  label: "Service Categories"
+  label_singular: "Service Category"
+  folder: "content/service_categories"
+  create: true
+  
+  fields:
+    - { label: "Category Name", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Description", name: "description", widget: "text", required: true }
+    - { label: "Icon", name: "icon", widget: "string", required: false }
+    - { label: "Color", name: "color", widget: "color", default: "#10B981" }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+    - { label: "Show in Filter", name: "show_in_filter", widget: "boolean", default: true }
+
+# =======================
+# 7.8 PORTFOLIO COLLECTION
+# =======================
+- name: "portfolio"
+  label: "Portfolio"
+  label_singular: "Project"
+  folder: "content/portfolio"
+  create: true
+  slug: "{{slug}}"
+  summary: "{{title}} - {{client}} ({{date}})"
+  
+  fields:
+    - { label: "Project Name", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Client Name", name: "client", widget: "string", required: false }
+    - { label: "Client Logo", name: "client_logo", widget: "image", required: false }
+    - { label: "Client Website", name: "client_website", widget: "string", required: false }
+    - { label: "Project Date", name: "date", widget: "datetime", required: true }
+    - { label: "Project End Date", name: "end_date", widget: "datetime", required: false }
+    - { 
+        label: "Project Status", 
+        name: "status", 
+        widget: "select",
+        options: 
+          - { label: "✅ Completed", value: "completed" }
+          - { label: "🚧 In Progress", value: "in_progress" }
+          - { label: "📅 Planned", value: "planned" }
+          - { label: "🔄 Ongoing", value: "ongoing" }
+          - { label: "⏸️ On Hold", value: "on_hold" }
+        default: "completed"
+      }
+    - { 
+        label: "Project Type", 
+        name: "project_type", 
+        widget: "relation",
+        collection: "project_types",
+        required: true
+      }
+    - { 
+        label: "Industry", 
+        name: "industry", 
+        widget: "relation",
+        collection: "industries",
+        required: false
+      }
+    - { label: "Project URL", name: "project_url", widget: "string", required: false }
+    - { label: "Repository URL", name: "repo_url", widget: "string", required: false }
+    - { label: "Case Study URL", name: "case_study_url", widget: "string", required: false }
+    - { label: "Featured Image", name: "thumbnail", widget: "image", required: true }
+    - { 
+        label: "Gallery", 
+        name: "gallery", 
+        widget: "list",
+        fields: 
+          - { label: "Image", name: "image", widget: "image", required: true }
+          - { label: "Caption", name: "caption", widget: "string", required: false }
+          - { label: "Alt Text", name: "alt", widget: "string", required: true }
+      }
+    - { 
+        label: "Videos", 
+        name: "videos", 
+        widget: "list",
+        fields: 
+          - { label: "Video URL", name: "url", widget: "string" }
+          - { label: "Thumbnail", name: "thumbnail", widget: "image", required: false }
+          - { label: "Caption", name: "caption", widget: "string", required: false }
+      }
+    - { label: "Project Description", name: "description", widget: "markdown", required: true }
+    - { label: "Challenge", name: "challenge", widget: "markdown", required: false }
+    - { label: "Solution", name: "solution", widget: "markdown", required: false }
+    - { label: "Results", name: "results", widget: "markdown", required: false }
+    - { 
+        label: "Key Metrics", 
+        name: "metrics", 
+        widget: "list",
+        fields: 
+          - { label: "Metric Name", name: "name", widget: "string" }
+          - { label: "Value", name: "value", widget: "string" }
+          - { label: "Change", name: "change", widget: "string", hint: "e.g., +25%" }
+          - { label: "Icon", name: "icon", widget: "string", required: false }
+      }
+    - { label: "Technologies Used", name: "technologies", widget: "list", required: true }
+    - { 
+        label: "Team Members", 
+        name: "team", 
+        widget: "relation",
+        collection: "team",
+        multiple: true,
+        required: false
+      }
+    - { 
+        label: "Services Used", 
+        name: "services", 
+        widget: "relation",
+        collection: "services",
+        multiple: true,
+        required: false
+      }
+    - { label: "Budget Range", name: "budget", widget: "string", required: false }
+    - { label: "Timeline", name: "timeline", widget: "string", required: false }
+    - { label: "Testimonial", name: "testimonial", widget: "relation", collection: "testimonials", required: false }
+    - { label: "Featured Project", name: "featured", widget: "boolean", default: false }
+    - { label: "Show on Homepage", name: "show_on_homepage", widget: "boolean", default: false }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+    - { 
+        label: "SEO", 
+        name: "seo", 
+        widget: "object",
+        fields: 
+          - { label: "Meta Title", name: "meta_title", widget: "string" }
+          - { label: "Meta Description", name: "meta_description", widget: "text" }
+          - { label: "Keywords", name: "keywords", widget: "list" }
+      }
+    - { 
+        label: "Project Details", 
+        name: "details", 
+        widget: "object",
+        collapsed: true,
+        fields: 
+          - { label: "Team Size", name: "team_size", widget: "number" }
+          - { label: "Project Duration", name: "duration", widget: "string" }
+          - { label: "Client Location", name: "client_location", widget: "string" }
+          - { label: "Project Location", name: "project_location", widget: "string" }
+          - { label: "Launch Date", name: "launch_date", widget: "datetime" }
+      }
+
+# =======================
+# 7.9 PROJECT TYPES
+# =======================
+- name: "project_types"
+  label: "Project Types"
+  label_singular: "Project Type"
+  folder: "content/project_types"
+  create: true
+  
+  fields:
+    - { label: "Type Name", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Description", name: "description", widget: "text", required: true }
+    - { label: "Icon", name: "icon", widget: "string", required: false }
+    - { label: "Color", name: "color", widget: "color", default: "#8B5CF6" }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+
+# =======================
+# 7.10 INDUSTRIES
+# =======================
+- name: "industries"
+  label: "Industries"
+  label_singular: "Industry"
+  folder: "content/industries"
+  create: true
+  
+  fields:
+    - { label: "Industry Name", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Description", name: "description", widget: "text", required: true }
+    - { label: "Icon", name: "icon", widget: "string", required: false }
+    - { label: "Color", name: "color", widget: "color", default: "#F59E0B" }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+
+# =======================
+# 7.11 TESTIMONIALS
+# =======================
+- name: "testimonials"
+  label: "Testimonials"
+  label_singular: "Testimonial"
+  folder: "content/testimonials"
+  create: true
+  slug: "{{slug}}"
+  
+  fields:
+    - { label: "Client Name", name: "name", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Company/Business", name: "company", widget: "string", required: false }
+    - { label: "Position", name: "position", widget: "string", required: false }
+    - { label: "Company Logo", name: "company_logo", widget: "image", required: false }
+    - { label: "Company Website", name: "company_website", widget: "string", required: false }
+    - { label: "Client Photo", name: "photo", widget: "image", required: false }
+    - { label: "Testimonial Text", name: "body", widget: "text", required: true }
+    - { label: "Short Version", name: "short_version", widget: "string", required: false, hint: "For cards and previews" }
+    - { label: "Rating", name: "rating", widget: "number", value_type: "int", min: 1, max: 5, default: 5 }
+    - { label: "Date", name: "date", widget: "datetime", required: true }
+    - { label: "Project", name: "project", widget: "relation", collection: "portfolio", required: false }
+    - { label: "Service", name: "service", widget: "relation", collection: "services", required: false }
+    - { label: "Video Testimonial URL", name: "video_url", widget: "string", required: false }
+    - { label: "Featured Testimonial", name: "featured", widget: "boolean", default: false }
+    - { label: "Show on Homepage", name: "show_on_homepage", widget: "boolean", default: false }
+    - { label: "Show in Sidebar", name: "show_in_sidebar", widget: "boolean", default: false }
+    - { label: "Approved", name: "approved", widget: "boolean", default: true }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+    - { 
+        label: "Social Proof", 
+        name: "social_proof", 
+        widget: "object",
+        collapsed: true,
+        fields: 
+          - { label: "LinkedIn Profile", name: "linkedin", widget: "string", required: false }
+          - { label: "Twitter Handle", name: "twitter", widget: "string", required: false }
+          - { label: "Verification Status", name: "verified", widget: "boolean", default: false }
+      }
+
+# =======================
+# 7.12 TEAM MEMBERS
+# =======================
+- name: "team"
+  label: "Team"
+  label_singular: "Team Member"
+  folder: "content/team"
+  create: true
+  slug: "{{slug}}"
+  summary: "{{name}} - {{position}}"
+  
+  fields:
+    - { label: "Full Name", name: "name", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Position/Title", name: "position", widget: "string", required: true }
+    - { label: "Department", name: "department", widget: "relation", collection: "departments", required: true }
+    - { label: "Role Level", name: "level", widget: "select", options: ["executive", "senior", "mid", "junior", "intern"], default: "mid" }
+    - { label: "Profile Photo", name: "photo", widget: "image", required: true }
+    - { label: "Bio", name: "bio", widget: "markdown", required: true }
+    - { label: "Short Bio", name: "short_bio", widget: "text", required: false, hint: "For cards and previews" }
+    - { label: "Expertise", name: "expertise", widget: "list", required: true }
+    - { 
+        label: "Skills", 
+        name: "skills", 
+        widget: "list",
+        fields: 
+          - { label: "Skill Name", name: "name", widget: "string" }
+          - { label: "Proficiency", name: "proficiency", widget: "select", options: ["expert", "advanced", "intermediate", "beginner"] }
+          - { label: "Years of Experience", name: "years", widget: "number", value_type: "int" }
+      }
+    - { label: "Email", name: "email", widget: "string", required: true, pattern: ['^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$', 'Must be a valid email'] }
+    - { label: "Phone", name: "phone", widget: "string", required: false }
+    - { label: "Location", name: "location", widget: "string", required: false }
+    - { label: "Join Date", name: "join_date", widget: "datetime", required: true }
+    - { 
+        label: "Social Media", 
+        name: "social", 
+        widget: "object",
+        collapsed: true,
+        fields: 
+          - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
+          - { label: "Twitter", name: "twitter", widget: "string", required: false }
+          - { label: "GitHub", name: "github", widget: "string", required: false }
+          - { label: "GitLab", name: "gitlab", widget: "string", required: false }
+          - { label: "Stack Overflow", name: "stackoverflow", widget: "string", required: false }
+          - { label: "Personal Website", name: "website", widget: "string", required: false }
+          - { label: "Dribbble", name: "dribbble", widget: "string", required: false }
+          - { label: "Behance", name: "behance", widget: "string", required: false }
+      }
+    - { 
+        label: "Projects", 
+        name: "projects", 
+        widget: "relation",
+        collection: "portfolio",
+        multiple: true,
+        required: false
+      }
+    - { 
+        label: "Posts", 
+        name: "posts", 
+        widget: "relation",
+        collection: "posts",
+        multiple: true,
+        required: false
+      }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+    - { label: "Show on Team Page", name: "show_on_team", widget: "boolean", default: true }
+    - { label: "Show on Homepage", name: "show_on_homepage", widget: "boolean", default: false }
+    - { label: "Active", name: "active", widget: "boolean", default: true }
+    - { 
+        label: "Availability", 
+        name: "availability", 
+        widget: "object",
+        collapsed: true,
+        fields: 
+          - { label: "Status", name: "status", widget: "select", options: ["available", "busy", "out_of_office", "vacation"], default: "available" }
+          - { label: "Next Available", name: "next_available", widget: "datetime", required: false }
+          - { label: "Hours per Week", name: "hours_per_week", widget: "number", value_type: "int", default: 40 }
+      }
+    - { 
+        label: "Education", 
+        name: "education", 
+        widget: "list",
+        fields: 
+          - { label: "Degree", name: "degree", widget: "string" }
+          - { label: "Field", name: "field", widget: "string" }
+          - { label: "Institution", name: "institution", widget: "string" }
+          - { label: "Year", name: "year", widget: "number" }
+      }
+    - { 
+        label: "Certifications", 
+        name: "certifications", 
+        widget: "list",
+        fields: 
+          - { label: "Name", name: "name", widget: "string" }
+          - { label: "Issuer", name: "issuer", widget: "string" }
+          - { label: "Year", name: "year", widget: "number" }
+          - { label: "Credential ID", name: "credential_id", widget: "string", required: false }
+      }
+
+# =======================
+# 7.13 DEPARTMENTS
+# =======================
+- name: "departments"
+  label: "Departments"
+  label_singular: "Department"
+  folder: "content/departments"
+  create: true
+  
+  fields:
+    - { label: "Department Name", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Description", name: "description", widget: "text", required: true }
+    - { label: "Head of Department", name: "head", widget: "relation", collection: "team", required: false }
+    - { label: "Icon", name: "icon", widget: "string", required: false }
+    - { label: "Color", name: "color", widget: "color", default: "#EF4444" }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+
+# =======================
+# 7.14 PRODUCTS (E-COMMERCE)
+# =======================
+- name: "products"
+  label: "Products"
+  label_singular: "Product"
+  folder: "content/products"
+  create: true
+  slug: "{{slug}}"
+  
+  fields:
+    - { label: "Product Name", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "SKU", name: "sku", widget: "string", required: true, pattern: ['^[A-Z0-9\\-]+$', 'Uppercase letters, numbers, and hyphens only'] }
+    - { label: "Product Type", name: "product_type", widget: "select", options: ["physical", "digital", "service", "subscription"], default: "digital" }
+    - { label: "Category", name: "category", widget: "relation", collection: "product_categories", required: true }
+    - { label: "Brand", name: "brand", widget: "relation", collection: "brands", required: false }
+    - { label: "Short Description", name: "short_description", widget: "text", required: true }
+    - { label: "Full Description", name: "description", widget: "markdown", required: true }
+    - { label: "Featured Image", name: "featured_image", widget: "image", required: true }
+    - { 
+        label: "Gallery Images", 
+        name: "gallery", 
+        widget: "list",
+        fields: 
+          - { label: "Image", name: "image", widget: "image" }
+          - { label: "Alt Text", name: "alt", widget: "string" }
+      }
+    - { label: "Regular Price", name: "regular_price", widget: "number", value_type: "float", min: 0, required: true }
+    - { label: "Sale Price", name: "sale_price", widget: "number", value_type: "float", min: 0, required: false }
+    - { label: "Sale Start Date", name: "sale_start", widget: "datetime", required: false }
+    - { label: "Sale End Date", name: "sale_end", widget: "datetime", required: false }
+    - { label: "Cost Price", name: "cost_price", widget: "number", value_type: "float", min: 0, required: false }
+    - { label: "Currency", name: "currency", widget: "select", options: ["USD", "EUR", "GBP", "CAD", "AUD"], default: "USD" }
+    - { 
+        label: "Inventory", 
+        name: "inventory", 
+        widget: "object",
+        collapsed: true,
+        fields: 
+          - { label: "Stock Quantity", name: "quantity", widget: "number", value_type: "int", default: 0 }
+          - { label: "Stock Status", name: "status", widget: "select", options: ["in_stock", "out_of_stock", "backorder", "discontinued"], default: "in_stock" }
+          - { label: "Low Stock Threshold", name: "low_stock", widget: "number", value_type: "int", default: 5 }
+          - { label: "Manage Stock", name: "manage_stock", widget: "boolean", default: true }
+          - { label: "Sold Individually", name: "sold_individually", widget: "boolean", default: false }
+      }
+    - { label: "Weight (kg)", name: "weight", widget: "number", value_type: "float", min: 0, required: false }
+    - { label: "Dimensions (L x W x H cm)", name: "dimensions", widget: "object",
+        fields: 
+          - { label: "Length", name: "length", widget: "number", value_type: "float" }
+          - { label: "Width", name: "width", widget: "number", value_type: "float" }
+          - { label: "Height", name: "height", widget: "number", value_type: "float" }
+      }
+    - { 
+        label: "Attributes", 
+        name: "attributes", 
+        widget: "list",
+        fields: 
+          - { label: "Attribute Name", name: "name", widget: "string" }
+          - { label: "Values", name: "values", widget: "list" }
+          - { label: "Visible", name: "visible", widget: "boolean", default: true }
+          - { label: "Variation", name: "variation", widget: "boolean", default: false }
+      }
+    - { 
+        label: "Variations", 
+        name: "variations", 
+        widget: "list",
+        fields: 
+          - { label: "SKU", name: "sku", widget: "string" }
+          - { label: "Attributes", name: "attributes", widget: "list",
+              fields: 
+                - { label: "Name", name: "name", widget: "string" }
+                - { label: "Value", name: "value", widget: "string" }
+            }
+          - { label: "Price", name: "price", widget: "number", value_type: "float" }
+          - { label: "Image", name: "image", widget: "image", required: false }
+          - { label: "Stock Quantity", name: "stock", widget: "number", value_type: "int" }
+      }
+    - { 
+        label: "Related Products", 
+        name: "related_products", 
+        widget: "relation",
+        collection: "products",
+        multiple: true,
+        required: false
+      }
+    - { 
+        label: "Upsell Products", 
+        name: "upsells", 
+        widget: "relation",
+        collection: "products",
+        multiple: true,
+        required: false
+      }
+    - { 
+        label: "Cross-sell Products", 
+        name: "cross_sells", 
+        widget: "relation",
+        collection: "products",
+        multiple: true,
+        required: false
+      }
+    - { label: "Tags", name: "tags", widget: "list", required: false }
+    - { label: "Featured Product", name: "featured", widget: "boolean", default: false }
+    - { label: "Virtual Product", name: "virtual", widget: "boolean", default: false }
+    - { label: "Downloadable", name: "downloadable", widget: "boolean", default: false }
+    - { 
+        label: "Downloads", 
+        name: "downloads", 
+        widget: "list",
+        fields: 
+          - { label: "File", name: "file", widget: "file" }
+          - { label: "Name", name: "name", widget: "string" }
+          - { label: "Download Limit", name: "limit", widget: "number", value_type: "int", default: 0 }
+          - { label: "Download Expiry", name: "expiry", widget: "number", value_type: "int", default: 0 }
+      }
+    - { label: "External Product", name: "external", widget: "boolean", default: false }
+    - { label: "External URL", name: "external_url", widget: "string", required: false }
+    - { label: "Button Text", name: "button_text", widget: "string", default: "Buy Now" }
+    - { label: "Average Rating", name: "rating", widget: "number", value_type: "float", min: 0, max: 5, default: 0 }
+    - { label: "Review Count", name: "review_count", widget: "number", value_type: "int", default: 0 }
+    - { label: "Purchase Note", name: "purchase_note", widget: "text", required: false }
+    - { label: "Menu Order", name: "menu_order", widget: "number", value_type: "int", default: 0 }
+    - { label: "Published", name: "published", widget: "boolean", default: true }
+    - { 
+        label: "SEO", 
+        name: "seo", 
+        widget: "object",
+        fields: 
+          - { label: "Meta Title", name: "meta_title", widget: "string" }
+          - { label: "Meta Description", name: "meta_description", widget: "text" }
+          - { label: "Focus Keyword", name: "focus_keyword", widget: "string" }
+      }
+
+# =======================
+# 7.15 PRODUCT CATEGORIES
+# =======================
+- name: "product_categories"
+  label: "Product Categories"
+  label_singular: "Product Category"
+  folder: "content/product_categories"
+  create: true
+  nested:
+    depth: 3
+  
+  fields:
+    - { label: "Category Name", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Description", name: "description", widget: "text", required: true }
+    - { label: "Parent Category", name: "parent", widget: "relation", collection: "product_categories", required: false }
+    - { label: "Image", name: "image", widget: "image", required: false }
+    - { label: "Display Type", name: "display_type", widget: "select", options: ["products", "subcategories", "both"], default: "products" }
+    - { label: "Menu Order", name: "menu_order", widget: "number", value_type: "int", default: 0 }
+    - { label: "Show in Menu", name: "show_in_menu", widget: "boolean", default: true }
+
+# =======================
+# 7.16 BRANDS
+# =======================
+- name: "brands"
+  label: "Brands"
+  label_singular: "Brand"
+  folder: "content/brands"
+  create: true
+  
+  fields:
+    - { label: "Brand Name", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Logo", name: "logo", widget: "image", required: true }
+    - { label: "Description", name: "description", widget: "text", required: true }
+    - { label: "Website", name: "website", widget: "string", required: false }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+
+# =======================
+# 7.17 COURSES (EDUCATION)
+# =======================
+- name: "courses"
+  label: "Courses"
+  label_singular: "Course"
+  folder: "content/courses"
+  create: true
+  
+  fields:
+    - { label: "Course Title", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Course Code", name: "code", widget: "string", required: true }
+    - { label: "Short Description", name: "short_description", widget: "text", required: true }
+    - { label: "Full Description", name: "description", widget: "markdown", required: true }
+    - { label: "Course Image", name: "image", widget: "image", required: true }
+    - { label: "Category", name: "category", widget: "relation", collection: "course_categories", required: true }
+    - { label: "Difficulty Level", name: "difficulty", widget: "select", options: ["beginner", "intermediate", "advanced", "expert"], default: "beginner" }
+    - { label: "Duration", name: "duration", widget: "string", required: true, hint: "e.g., 8 weeks, 40 hours" }
+    - { label: "Instructor", name: "instructor", widget: "relation", collection: "team", required: true }
+    - { label: "Co-instructors", name: "co_instructors", widget: "relation", collection: "team", multiple: true, required: false }
+    - { 
+        label: "Curriculum", 
+        name: "curriculum", 
+        widget: "list",
+        fields: 
+          - { label: "Module Title", name: "title", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+          - { 
+              label: "Lessons", 
+              name: "lessons", 
+              widget: "list",
+              fields: 
+                - { label: "Lesson Title", name: "title", widget: "string" }
+                - { label: "Duration", name: "duration", widget: "string" }
+                - { label: "Content Type", name: "type", widget: "select", options: ["video", "article", "quiz", "assignment"] }
+                - { label: "Content", name: "content", widget: "markdown" }
+                - { label: "Resources", name: "resources", widget: "list" }
+            }
+      }
+    - { 
+        label: "Pricing", 
+        name: "pricing", 
+        widget: "object",
+        fields: 
+          - { label: "Price", name: "price", widget: "number", value_type: "float" }
+          - { label: "Currency", name: "currency", widget: "select", options: ["USD", "EUR", "GBP"], default: "USD" }
+          - { label: "Sale Price", name: "sale_price", widget: "number", value_type: "float", required: false }
+          - { label: "Installment Plan", name: "installment", widget: "boolean", default: false }
+          - { label: "Installment Amount", name: "installment_amount", widget: "number", value_type: "float", required: false }
+          - { label: "Number of Installments", name: "installment_count", widget: "number", value_type: "int", required: false }
+      }
+    - { 
+        label: "Requirements", 
+        name: "requirements", 
+        widget: "list",
+        required: false
+      }
+    - { 
+        label: "Learning Outcomes", 
+        name: "outcomes", 
+        widget: "list",
+        required: true
+      }
+    - { label: "Certificate Included", name: "certificate", widget: "boolean", default: false }
+    - { label: "Access Period", name: "access_period", widget: "string", default: "lifetime", hint: "e.g., 1 year, 6 months, lifetime" }
+    - { label: "Student Count", name: "student_count", widget: "number", value_type: "int", default: 0 }
+    - { label: "Average Rating", name: "rating", widget: "number", value_type: "float", min: 0, max: 5, default: 0 }
+    - { label: "Review Count", name: "review_count", widget: "number", value_type: "int", default: 0 }
+    - { label: "Featured Course", name: "featured", widget: "boolean", default: false }
+    - { label: "Published", name: "published", widget: "boolean", default: true }
+    - { label: "Enrollment Open", name: "enrollment_open", widget: "boolean", default: true }
+    - { label: "Start Date", name: "start_date", widget: "datetime", required: false }
+    - { label: "End Date", name: "end_date", widget: "datetime", required: false }
+
+# =======================
+# 7.18 COURSE CATEGORIES
+# =======================
+- name: "course_categories"
+  label: "Course Categories"
+  label_singular: "Course Category"
+  folder: "content/course_categories"
+  create: true
+  nested:
+    depth: 2
+  
+  fields:
+    - { label: "Category Name", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Description", name: "description", widget: "text", required: true }
+    - { label: "Parent Category", name: "parent", widget: "relation", collection: "course_categories", required: false }
+    - { label: "Icon", name: "icon", widget: "string", required: false }
+    - { label: "Color", name: "color", widget: "color", default: "#3B82F6" }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+
+# =======================
+# 7.19 EVENTS
+# =======================
+- name: "events"
+  label: "Events"
+  label_singular: "Event"
+  folder: "content/events"
+  create: true
+  
+  fields:
+    - { label: "Event Title", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Event Type", name: "event_type", widget: "select", options: ["webinar", "workshop", "conference", "meetup", "training"], default: "webinar" }
+    - { label: "Short Description", name: "short_description", widget: "text", required: true }
+    - { label: "Full Description", name: "description", widget: "markdown", required: true }
+    - { label: "Featured Image", name: "image", widget: "image", required: true }
+    - { label: "Start Date & Time", name: "start_date", widget: "datetime", required: true }
+    - { label: "End Date & Time", name: "end_date", widget: "datetime", required: true }
+    - { label: "Timezone", name: "timezone", widget: "select", 
+        options: 
+          - "UTC"
+          - "America/New_York"
+          - "America/Chicago"
+          - "America/Denver"
+          - "America/Los_Angeles"
+          - "Europe/London"
+          - "Europe/Paris"
+          - "Asia/Tokyo"
+          - "Australia/Sydney"
+        default: "UTC"
+      }
+    - { label: "Venue Type", name: "venue_type", widget: "select", options: ["online", "in_person", "hybrid"], default: "online" }
+    - { label: "Venue Name", name: "venue_name", widget: "string", required: false }
+    - { label: "Venue Address", name: "venue_address", widget: "text", required: false }
+    - { label: "Online Platform", name: "online_platform", widget: "string", required: false, hint: "e.g., Zoom, Google Meet" }
+    - { label: "Online Meeting URL", name: "online_url", widget: "string", required: false }
+    - { 
+        label: "Speakers", 
+        name: "speakers", 
+        widget: "list",
+        fields: 
+          - { label: "Speaker", name: "speaker", widget: "relation", collection: "team" }
+          - { label: "Topic", name: "topic", widget: "string" }
+          - { label: "Time Slot", name: "time_slot", widget: "string" }
+      }
+    - { 
+        label: "Agenda", 
+        name: "agenda", 
+        widget: "list",
+        fields: 
+          - { label: "Time", name: "time", widget: "string" }
+          - { label: "Session Title", name: "title", widget: "string" }
+          - { label: "Speaker", name: "speaker", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+      }
+    - { label: "Registration Required", name: "registration_required", widget: "boolean", default: true }
+    - { label: "Registration URL", name: "registration_url", widget: "string", required: false }
+    - { label: "Registration Deadline", name: "registration_deadline", widget: "datetime", required: false }
+    - { label: "Maximum Attendees", name: "max_attendees", widget: "number", value_type: "int", required: false }
+    - { label: "Current Attendees", name: "current_attendees", widget: "number", value_type: "int", default: 0 }
+    - { label: "Price", name: "price", widget: "number", value_type: "float", default: 0 }
+    - { label: "Currency", name: "currency", widget: "select", options: ["USD", "EUR", "GBP"], default: "USD" }
+    - { label: "Event Status", name: "status", widget: "select", options: ["upcoming", "ongoing", "completed", "cancelled"], default: "upcoming" }
+    - { label: "Featured Event", name: "featured", widget: "boolean", default: false }
+    - { label: "Published", name: "published", widget: "boolean", default: true }
+
+# =======================
+# 7.20 JOBS/CAREERS
+# =======================
+- name: "jobs"
+  label: "Job Openings"
+  label_singular: "Job"
+  folder: "content/jobs"
+  create: true
+  
+  fields:
+    - { label: "Job Title", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Job ID", name: "job_id", widget: "string", required: true }
+    - { label: "Department", name: "department", widget: "relation", collection: "departments", required: true }
+    - { label: "Location", name: "location", widget: "select", options: ["remote", "hybrid", "onsite"], default: "remote" }
+    - { label: "Location Details", name: "location_details", widget: "string", required: false }
+    - { label: "Employment Type", name: "employment_type", widget: "select", options: ["full_time", "part_time", "contract", "internship"], default: "full_time" }
+    - { label: "Experience Level", name: "experience_level", widget: "select", options: ["entry", "mid", "senior", "lead"], default: "mid" }
+    - { label: "Job Description", name: "description", widget: "markdown", required: true }
+    - { 
+        label: "Responsibilities", 
+        name: "responsibilities", 
+        widget: "list",
+        required: true
+      }
+    - { 
+        label: "Requirements", 
+        name: "requirements", 
+        widget: "list",
+        required: true
+      }
+    - { 
+        label: "Nice-to-haves", 
+        name: "nice_to_have", 
+        widget: "list",
+        required: false
+      }
+    - { label: "Salary Range", name: "salary_range", widget: "string", required: false }
+    - { label: "Application Deadline", name: "deadline", widget: "datetime", required: false }
+    - { label: "Application URL", name: "application_url", widget: "string", required: false }
+    - { label: "Contact Email", name: "contact_email", widget: "string", required: true }
+    - { label: "Hiring Manager", name: "hiring_manager", widget: "relation", collection: "team", required: false }
+    - { label: "Open Positions", name: "open_positions", widget: "number", value_type: "int", default: 1 }
+    - { label: "Applications Received", name: "applications_received", widget: "number", value_type: "int", default: 0 }
+    - { label: "Job Status", name: "status", widget: "select", options: ["open", "closed", "filled", "cancelled"], default: "open" }
+    - { label: "Featured Job", name: "featured", widget: "boolean", default: false }
+    - { label: "Published", name: "published", widget: "boolean", default: true }
+    - { label: "Posted Date", name: "posted_date", widget: "datetime", required: true }
+
+# =======================
+# 7.21 API DOCUMENTATION
+# =======================
+- name: "api_docs"
+  label: "API Documentation"
+  label_singular: "API Endpoint"
+  folder: "content/api-docs"
+  create: true
+  nested:
+    depth: 3
+  
+  fields:
+    - { label: "Endpoint Title", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "API Version", name: "api_version", widget: "string", default: "v1" }
+    - { label: "HTTP Method", name: "method", widget: "select", options: ["GET", "POST", "PUT", "PATCH", "DELETE"], default: "GET" }
+    - { label: "Endpoint Path", name: "path", widget: "string", required: true, hint: "e.g., /api/v1/users" }
+    - { label: "Description", name: "description", widget: "markdown", required: true }
+    - { label: "Authentication Required", name: "auth_required", widget: "boolean", default: true }
+    - { label: "Authentication Type", name: "auth_type", widget: "select", options: ["api_key", "bearer_token", "oauth2", "none"], default: "api_key" }
+    - { 
+        label: "Parameters", 
+        name: "parameters", 
+        widget: "list",
+        fields: 
+          - { label: "Name", name: "name", widget: "string" }
+          - { label: "Type", name: "type", widget: "select", options: ["string", "number", "boolean", "array", "object"] }
+          - { label: "Required", name: "required", widget: "boolean", default: false }
+          - { label: "Description", name: "description", widget: "text" }
+          - { label: "Default Value", name: "default", widget: "string", required: false }
+          - { label: "Example", name: "example", widget: "string", required: false }
+      }
+    - { 
+        label: "Request Body", 
+        name: "request_body", 
+        widget: "object",
+        collapsed: true,
+        fields: 
+          - { label: "Content Type", name: "content_type", widget: "select", options: ["application/json", "application/xml", "multipart/form-data"], default: "application/json" }
+          - { label: "Schema", name: "schema", widget: "code", default_language: "json" }
+          - { label: "Example", name: "example", widget: "code", default_language: "json" }
+      }
+    - { 
+        label: "Response", 
+        name: "response", 
+        widget: "object",
+        collapsed: true,
+        fields: 
+          - { label: "Status Code", name: "status_code", widget: "number", value_type: "int", default: 200 }
+          - { label: "Content Type", name: "content_type", widget: "string", default: "application/json" }
+          - { label: "Schema", name: "schema", widget: "code", default_language: "json" }
+          - { label: "Example", name: "example", widget: "code", default_language: "json" }
+      }
+    - { 
+        label: "Error Responses", 
+        name: "errors", 
+        widget: "list",
+        fields: 
+          - { label: "Status Code", name: "status_code", widget: "number", value_type: "int" }
+          - { label: "Error Code", name: "error_code", widget: "string" }
+          - { label: "Message", name: "message", widget: "string" }
+          - { label: "Solution", name: "solution", widget: "text" }
+      }
+    - { label: "Rate Limit", name: "rate_limit", widget: "string", default: "100 requests per hour" }
+    - { label: "Deprecated", name: "deprecated", widget: "boolean", default: false }
+    - { label: "Replacement Endpoint", name: "replacement", widget: "string", required: false }
+    - { label: "Tags", name: "tags", widget: "list", required: false }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+    - { label: "Published", name: "published", widget: "boolean", default: true }
+
+# =======================
+# 7.22 FAQS
+# =======================
+- name: "faqs"
+  label: "FAQs"
+  label_singular: "FAQ"
+  folder: "content/faqs"
+  create: true
+  
+  fields:
+    - { label: "Question", name: "question", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Answer", name: "answer", widget: "markdown", required: true }
+    - { label: "Category", name: "category", widget: "relation", collection: "faq_categories", required: true }
+    - { label: "Related to Product", name: "related_product", widget: "relation", collection: "products", required: false }
+    - { label: "Related to Service", name: "related_service", widget: "relation", collection: "services", required: false }
+    - { label: "Tags", name: "tags", widget: "list", required: false }
+    - { label: "Featured FAQ", name: "featured", widget: "boolean", default: false }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+    - { label: "Published", name: "published", widget: "boolean", default: true }
+    - { label: "Last Updated", name: "last_updated", widget: "datetime", required: false }
+
+# =======================
+# 7.23 FAQ CATEGORIES
+# =======================
+- name: "faq_categories"
+  label: "FAQ Categories"
+  label_singular: "FAQ Category"
+  folder: "content/faq_categories"
+  create: true
+  
+  fields:
+    - { label: "Category Name", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Description", name: "description", widget: "text", required: true }
+    - { label: "Icon", name: "icon", widget: "string", required: false }
+    - { label: "Display Order", name: "order", widget: "number", default: 0 }
+
+# =======================
+# 7.24 NEWSLETTERS
+# =======================
+- name: "newsletters"
+  label: "Newsletters"
+  label_singular: "Newsletter"
+  folder: "content/newsletters"
+  create: true
+  
+  fields:
+    - { label: "Newsletter Title", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Issue Number", name: "issue_number", widget: "number", value_type: "int", required: true }
+    - { label: "Publication Date", name: "publication_date", widget: "datetime", required: true }
+    - { label: "Featured Image", name: "featured_image", widget: "image", required: true }
+    - { label: "Introduction", name: "introduction", widget: "markdown", required: true }
+    - { 
+        label: "Sections", 
+        name: "sections", 
+        widget: "list",
+        fields: 
+          - { label: "Section Title", name: "title", widget: "string" }
+          - { label: "Content", name: "content", widget: "markdown" }
+          - { label: "Featured Articles", name: "featured_articles", widget: "relation", collection: "posts", multiple: true }
+      }
+    - { label: "Subscriber Count", name: "subscriber_count", widget: "number", value_type: "int", default: 0 }
+    - { label: "Open Rate", name: "open_rate", widget: "number", value_type: "float", min: 0, max: 100, default: 0 }
+    - { label: "Click Rate", name: "click_rate", widget: "number", value_type: "float", min: 0, max: 100, default: 0 }
+    - { label: "Published", name: "published", widget: "boolean", default: true }
+    - { label: "Send to Subscribers", name: "send_to_subscribers", widget: "boolean", default: false }
+    - { label: "Send Date", name: "send_date", widget: "datetime", required: false }
+
+# =======================
+# 7.25 WHITEPAPERS/EBOOKS
+# =======================
+- name: "whitepapers"
+  label: "Whitepapers & eBooks"
+  label_singular: "Whitepaper"
+  folder: "content/whitepapers"
+  create: true
+  
+  fields:
+    - { label: "Title", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+    - { label: "Type", name: "type", widget: "select", options: ["whitepaper", "ebook", "guide", "report"], default: "whitepaper" }
+    - { label: "Cover Image", name: "cover_image", widget: "image", required: true }
+    - { label: "Description", name: "description", widget: "markdown", required: true }
+    - { label: "Authors", name: "authors", widget: "relation", collection: "team", multiple: true, required: true }
+    - { label: "Publication Date", name: "publication_date", widget: "datetime", required: true }
+    - { label: "Pages", name: "pages", widget: "number", value_type: "int", default: 1 }
+    - { label: "File", name: "file", widget: "file", required: true }
+    - { label: "File Size", name: "file_size", widget: "string", required: false }
+    - { label: "File Format", name: "file_format", widget: "select", options: ["pdf", "epub", "mobi"], default: "pdf" }
+    - { label: "Requires Email", name: "requires_email", widget: "boolean", default: true }
+    - { label: "Download Count", name: "download_count", widget: "number", value_type: "int", default: 0 }
+    - { label: "Featured", name: "featured", widget: "boolean", default: false }
+    - { label: "Published", name: "published", widget: "boolean", default: true }
+    - { label: "Tags", name: "tags", widget: "list", required: false }
+
+# =======================
+# 7.26 FORMS
+# =======================
+- name: "forms"
+  label: "Forms"
+  label_singular: "Form"
+  folder: "content/forms"
+  create: true
+  
+  fields:
+    - { label: "Form Title", name: "title", widget: "string", required: true }
+    - { label: "Slug", name: "slug", widget: "string", required: true }
+    - { label: "Description", name: "description", widget: "text", required: false }
+    - { label: "Form Type", name: "form_type", widget: "select", options: ["contact", "newsletter", "registration", "feedback", "survey", "application"], default: "contact" }
+    - { 
+        label: "Fields", 
+        name: "fields", 
+        widget: "list",
+        fields: 
+          - { label: "Field Label", name: "label", widget: "string" }
+          - { label: "Field Name", name: "name", widget: "string", pattern: ['^[a-z_]+$', 'Lowercase letters and underscores only'] }
+          - { label: "Field Type", name: "type", widget: "select", options: ["text", "email", "textarea", "select", "checkbox", "radio", "file", "date"] }
+          - { label: "Required", name: "required", widget: "boolean", default: false }
+          - { label: "Placeholder", name: "placeholder", widget: "string", required: false }
+          - { label: "Options", name: "options", widget: "list", required: false, hint: "For select, checkbox, radio fields" }
+          - { label: "Validation Pattern", name: "validation", widget: "string", required: false }
+          - { label: "Help Text", name: "help_text", widget: "string", required: false }
+      }
+    - { label: "Submit Button Text", name: "submit_text", widget: "string", default: "Submit" }
+    - { label: "Success Message", name: "success_message", widget: "text", default: "Thank you for your submission!" }
+    - { label: "Error Message", name: "error_message", widget: "text", default: "There was an error submitting the form. Please try again." }
+    - { label: "Email Notification", name: "email_notification", widget: "boolean", default: true }
+    - { label: "Notification Email", name: "notification_email", widget: "string", required: false }
+    - { label: "Auto-response", name: "auto_response", widget: "boolean", default: false }
+    - { label: "Auto-response Subject", name: "auto_response_subject", widget: "string", required: false }
+    - { label: "Auto-response Message", name: "auto_response_message", widget: "markdown", required: false }
+    - { label: "Submission Storage", name: "store_submissions", widget: "boolean", default: true }
+    - { label: "Max Submissions", name: "max_submissions", widget: "number", value_type: "int", required: false }
+    - { label: "Form Expiry", name: "expiry_date", widget: "datetime", required: false }
+    - { label: "Published", name: "published", widget: "boolean", default: true }
+    - { label: "Submission Count", name: "submission_count", widget: "number", value_type: "int", default: 0 }
+
+# =======================
+# 7.27 FORM SUBMISSIONS
+# =======================
+- name: "form_submissions"
+  label: "Form Submissions"
+  label_singular: "Submission"
+  folder: "content/form-submissions"
+  create: false  # Created programmatically, not manually
+  identifier_field: "submission_id"
+  
+  fields:
+    - { label: "Submission ID", name: "submission_id", widget: "string", required: true }
+    - { label: "Form", name: "form", widget: "relation", collection: "forms", required: true }
+    - { label: "Submission Date", name: "submission_date", widget: "datetime", required: true }
+    - { 
+        label: "Submission Data", 
+        name: "data", 
+        widget: "object",
+        fields: []
+      }
+    - { label: "IP Address", name: "ip_address", widget: "string", required: false }
+    - { label: "User Agent", name: "user_agent", widget: "string", required: false }
+    - { label: "Status", name: "status", widget: "select", options: ["new", "read", "replied", "archived"], default: "new" }
+    - { label: "Notes", name: "notes", widget: "text", required: false }
+
+# =======================
+# 7.28 REDIRECTS
+# =======================
+- name: "redirects"
+  label: "Redirects"
+  label_singular: "Redirect"
+  folder: "content/redirects"
+  create: true
+  
+  fields:
+    - { label: "Redirect From", name: "from", widget: "string", required: true, hint: "e.g., /old-page" }
+    - { label: "Redirect To", name: "to", widget: "string", required: true, hint: "e.g., /new-page or https://example.com" }
+    - { label: "Redirect Type", name: "type", widget: "select", options: ["301", "302", "307"], default: "301" }
+    - { label: "Active", name: "active", widget: "boolean", default: true }
+    - { label: "Notes", name: "notes", widget: "text", required: false }
+
+# =======================
+# 7.29 SITE SETTINGS
+# =======================
+- name: "settings"
+  label: "Site Settings"
+  delete: false
+  editor:
+    preview: false
+  
+  files:
+    # =======================
+    # 7.29.1 GENERAL SETTINGS
+    # =======================
+    - label: "General Settings"
+      name: "general"
+      file: "content/settings/general.json"
+      fields:
+        - { label: "Site Title", name: "site_title", widget: "string", required: true }
+        - { label: "Site Tagline", name: "site_tagline", widget: "string", required: false }
+        - { label: "Site Description", name: "site_description", widget: "text", required: true }
+        - { label: "Site Keywords", name: "site_keywords", widget: "list", required: false }
+        - { label: "Logo", name: "logo", widget: "image", required: false }
+        - { label: "Logo Light", name: "logo_light", widget: "image", required: false, hint: "For dark backgrounds" }
+        - { label: "Logo Dark", name: "logo_dark", widget: "image", required: false, hint: "For light backgrounds" }
+        - { label: "Favicon", name: "favicon", widget: "image", required: false }
+        - { label: "Apple Touch Icon", name: "apple_touch_icon", widget: "image", required: false }
+        - { label: "Default Language", name: "default_language", widget: "select", options: ["en", "es", "fr", "de", "ja"], default: "en" }
+        - { label: "Time Zone", name: "timezone", widget: "select", options: ["UTC", "America/New_York", "Europe/London", "Asia/Tokyo"], default: "UTC" }
+        - { label: "Date Format", name: "date_format", widget: "select", options: ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"], default: "DD/MM/YYYY" }
+        - { label: "Time Format", name: "time_format", widget: "select", options: ["12h", "24h"], default: "24h" }
+        - { 
+            label: "Contact Information", 
+            name: "contact", 
+            widget: "object",
+            fields: 
+              - { label: "Company Name", name: "company_name", widget: "string" }
+              - { label: "Email", name: "email", widget: "string", required: true }
+              - { label: "Phone", name: "phone", widget: "string", required: false }
+              - { label: "Fax", name: "fax", widget: "string", required: false }
+              - { label: "Address", name: "address", widget: "text", required: false }
+              - { label: "City", name: "city", widget: "string", required: false }
+              - { label: "State/Province", name: "state", widget: "string", required: false }
+              - { label: "Zip/Postal Code", name: "zip", widget: "string", required: false }
+              - { label: "Country", name: "country", widget: "string", required: false }
+              - { label: "Google Maps URL", name: "google_maps", widget: "string", required: false }
+              - { label: "Latitude", name: "latitude", widget: "string", required: false }
+              - { label: "Longitude", name: "longitude", widget: "string", required: false }
+          }
+        - { 
+            label: "Business Hours", 
+            name: "business_hours", 
+            widget: "object",
+            fields: 
+              - { label: "Monday", name: "monday", widget: "string", default: "9:00 AM - 5:00 PM" }
+              - { label: "Tuesday", name: "tuesday", widget: "string", default: "9:00 AM - 5:00 PM" }
+              - { label: "Wednesday", name: "wednesday", widget: "string", default: "9:00 AM - 5:00 PM" }
+              - { label: "Thursday", name: "thursday", widget: "string", default: "9:00 AM - 5:00 PM" }
+              - { label: "Friday", name: "friday", widget: "string", default: "9:00 AM - 5:00 PM" }
+              - { label: "Saturday", name: "saturday", widget: "string", default: "Closed" }
+              - { label: "Sunday", name: "sunday", widget: "string", default: "Closed" }
+              - { label: "Timezone", name: "timezone", widget: "string", default: "UTC" }
+          }
+        - { 
+            label: "Social Media", 
+            name: "social_media", 
+            widget: "object",
+            fields: 
+              - { label: "Facebook", name: "facebook", widget: "string", required: false }
+              - { label: "Twitter", name: "twitter", widget: "string", required: false }
+              - { label: "Instagram", name: "instagram", widget: "string", required: false }
+              - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
+              - { label: "YouTube", name: "youtube", widget: "string", required: false }
+              - { label: "GitHub", name: "github", widget: "string", required: false }
+              - { label: "GitLab", name: "gitlab", widget: "string", required: false }
+              - { label: "Stack Overflow", name: "stackoverflow", widget: "string", required: false }
+              - { label: "Discord", name: "discord", widget: "string", required: false }
+              - { label: "Slack", name: "slack", widget: "string", required: false }
+              - { label: "TikTok", name: "tiktok", widget: "string", required: false }
+              - { label: "Pinterest", name: "pinterest", widget: "string", required: false }
+              - { label: "Reddit", name: "reddit", widget: "string", required: false }
+              - { label: "WhatsApp", name: "whatsapp", widget: "string", required: false }
+              - { label: "Telegram", name: "telegram", widget: "string", required: false }
+              - { label: "Share Text", name: "share_text", widget: "string", default: "Check this out!" }
+          }
+        - { 
+            label: "Company Details", 
+            name: "company", 
+            widget: "object",
+            fields: 
+              - { label: "Founded Year", name: "founded_year", widget: "number", value_type: "int" }
+              - { label: "Number of Employees", name: "employee_count", widget: "string" }
+              - { label: "Industry", name: "industry", widget: "string" }
+              - { label: "Mission Statement", name: "mission", widget: "text" }
+              - { label: "Vision Statement", name: "vision", widget: "text" }
+              - { label: "Values", name: "values", widget: "list" }
+          }
+        - { 
+            label: "Legal", 
+            name: "legal", 
+            widget: "object",
+            fields: 
+              - { label: "Privacy Policy URL", name: "privacy_policy", widget: "string" }
+              - { label: "Terms of Service URL", name: "terms_of_service", widget: "string" }
+              - { label: "Cookie Policy URL", name: "cookie_policy", widget: "string" }
+              - { label: "Disclaimer", name: "disclaimer", widget: "text" }
+              - { label: "Copyright Text", name: "copyright", widget: "string", default: "© {{year}} {{company}}. All rights reserved." }
+          }
+        - { 
+            label: "Performance", 
+            name: "performance", 
+            widget: "object",
+            fields: 
+              - { label: "Enable Gzip Compression", name: "gzip", widget: "boolean", default: true }
+              - { label: "Enable Browser Caching", name: "browser_caching", widget: "boolean", default: true }
+              - { label: "Cache TTL (seconds)", name: "cache_ttl", widget: "number", value_type: "int", default: 3600 }
+              - { label: "Minify CSS/JS", name: "minify", widget: "boolean", default: true }
+              - { label: "Lazy Load Images", name: "lazy_load", widget: "boolean", default: true }
+              - { label: "Enable CDN", name: "cdn", widget: "boolean", default: false }
+              - { label: "CDN URL", name: "cdn_url", widget: "string", required: false }
+          }
+
+    # =======================
+    # 7.29.2 NAVIGATION SETTINGS
+    # =======================
+    - label: "Navigation"
+      name: "navigation"
+      file: "content/settings/navigation.json"
+      fields:
+        - { 
+            label: "Main Navigation", 
+            name: "main_nav", 
+            widget: "list",
+            fields: 
+              - { label: "Label", name: "label", widget: "string", required: true }
+              - { label: "URL", name: "url", widget: "string", required: true }
+              - { label: "Icon", name: "icon", widget: "string", required: false }
+              - { label: "Target", name: "target", widget: "select", options: ["_self", "_blank"], default: "_self" }
+              - { label: "CSS Class", name: "class", widget: "string", required: false }
+              - { 
+                  label: "Submenu Items", 
+                  name: "children", 
+                  widget: "list",
+                  fields: 
+                    - { label: "Label", name: "label", widget: "string" }
+                    - { label: "URL", name: "url", widget: "string" }
+                    - { label: "Icon", name: "icon", widget: "string", required: false }
+                    - { label: "Target", name: "target", widget: "select", options: ["_self", "_blank"], default: "_self" }
+                }
+          }
+        - { 
+            label: "Footer Navigation", 
+            name: "footer_nav", 
+            widget: "list",
+            fields: 
+              - { label: "Label", name: "label", widget: "string" }
+              - { label: "URL", name: "url", widget: "string" }
+              - { label: "Target", name: "target", widget: "select", options: ["_self", "_blank"], default: "_self" }
+          }
+        - { 
+            label: "Social Links", 
+            name: "social_links", 
+            widget: "list",
+            fields: 
+              - { label: "Platform", name: "platform", widget: "select", options: ["facebook", "twitter", "instagram", "linkedin", "youtube", "github"] }
+              - { label: "URL", name: "url", widget: "string" }
+              - { label: "Icon", name: "icon", widget: "string", required: false }
+              - { label: "Display Order", name: "order", widget: "number", default: 0 }
+          }
+        - { label: "Enable Breadcrumbs", name: "breadcrumbs", widget: "boolean", default: true }
+        - { label: "Enable Back to Top", name: "back_to_top", widget: "boolean", default: true }
+        - { label: "Sticky Navigation", name: "sticky_nav", widget: "boolean", default: true }
+
+    # =======================
+    # 7.29.3 HOMEPAGE SETTINGS
+    # =======================
+    - label: "Homepage"
+      name: "homepage"
+      file: "content/settings/homepage.json"
+      fields:
+        - { label: "Hero Section Title", name: "hero_title", widget: "string", required: true }
+        - { label: "Hero Section Subtitle", name: "hero_subtitle", widget: "text", required: false }
+        - { label: "Hero Image", name: "hero_image", widget: "image", required: false }
+        - { label: "Hero Video URL", name: "hero_video", widget: "string", required: false }
+        - { label: "Hero CTA Primary Text", name: "hero_cta_primary", widget: "string", default: "Get Started" }
+        - { label: "Hero CTA Primary Link", name: "hero_cta_primary_link", widget: "string", default: "/contact" }
+        - { label: "Hero CTA Secondary Text", name: "hero_cta_secondary", widget: "string", default: "Learn More" }
+        - { label: "Hero CTA Secondary Link", name: "hero_cta_secondary_link", widget: "string", default: "/about" }
+        - { label: "Show Featured Posts", name: "show_featured_posts", widget: "boolean", default: true }
+        - { label: "Featured Posts Count", name: "featured_posts_count", widget: "number", value_type: "int", default: 3 }
+        - { label: "Featured Posts Category", name: "featured_posts_category", widget: "relation", collection: "categories", required: false }
+        - { label: "Show Services Section", name: "show_services", widget: "boolean", default: true }
+        - { label: "Services Section Title", name: "services_title", widget: "string", default: "Our Services" }
+        - { label: "Services Section Subtitle", name: "services_subtitle", widget: "text", required: false }
+        - { label: "Show Portfolio Section", name: "show_portfolio", widget: "boolean", default: true }
+        - { label: "Portfolio Section Title", name: "portfolio_title", widget: "string", default: "Our Work" }
+        - { label: "Portfolio Section Subtitle", name: "portfolio_subtitle", widget: "text", required: false }
+        - { label: "Portfolio Items Count", name: "portfolio_count", widget: "number", value_type: "int", default: 6 }
+        - { label: "Show Testimonials Section", name: "show_testimonials", widget: "boolean", default: true }
+        - { label: "Testimonials Section Title", name: "testimonials_title", widget: "string", default: "What Our Clients Say" }
+        - { label: "Testimonials Section Subtitle", name: "testimonials_subtitle", widget: "text", required: false }
+        - { label: "Show Team Section", name: "show_team", widget: "boolean", default: true }
+        - { label: "Team Section Title", name: "team_title", widget: "string", default: "Meet Our Team" }
+        - { label: "Team Section Subtitle", name: "team_subtitle", widget: "text", required: false }
+        - { label: "Show Stats Section", name: "show_stats", name: "show_stats", widget: "boolean", default: true }
+        - { 
+            label: "Stats", 
+            name: "stats", 
+            widget: "list",
+            fields: 
+              - { label: "Stat Value", name: "value", widget: "string" }
+              - { label: "Stat Label", name: "label", widget: "string" }
+              - { label: "Icon", name: "icon", widget: "string", required: false }
+              - { label: "Prefix", name: "prefix", widget: "string", required: false }
+              - { label: "Suffix", name: "suffix", widget: "string", required: false }
+          }
+        - { label: "Show Newsletter Signup", name: "show_newsletter", widget: "boolean", default: true }
+        - { label: "Newsletter Title", name: "newsletter_title", widget: "string", default: "Stay Updated" }
+        - { label: "Newsletter Subtitle", name: "newsletter_subtitle", widget: "text", required: false }
+        - { label: "Newsletter Form ID", name: "newsletter_form", widget: "relation", collection: "forms", required: false }
+
+    # =======================
+    # 7.29.4 BLOG SETTINGS
+    # =======================
+    - label: "Blog Settings"
+      name: "blog"
+      file: "content/settings/blog.json"
+      fields:
+        - { label: "Blog Title", name: "blog_title", widget: "string", default: "Blog" }
+        - { label: "Blog Description", name: "blog_description", widget: "text", required: false }
+        - { label: "Posts per Page", name: "posts_per_page", widget: "number", value_type: "int", default: 10 }
+        - { label: "Default Post Image", name: "default_post_image", widget: "image", required: false }
+        - { label: "Show Author Info", name: "show_author_info", widget: "boolean", default: true }
+        - { label: "Show Date", name: "show_date", widget: "boolean", default: true }
+        - { label: "Show Reading Time", name: "show_reading_time", widget: "boolean", default: true }
+        - { label: "Show Categories", name: "show_categories", widget: "boolean", default: true }
+        - { label: "Show Tags", name: "show_tags", widget: "boolean", default: true }
+        - { label: "Show Share Buttons", name: "show_share_buttons", widget: "boolean", default: true }
+        - { label: "Show Related Posts", name: "show_related_posts", widget: "boolean", default: true }
+        - { label: "Related Posts Count", name: "related_posts_count", widget: "number", value_type: "int", default: 3 }
+        - { label: "Show Comments", name: "show_comments", widget: "boolean", default: true }
+        - { label: "Comments System", name: "comments_system", widget: "select", options: ["disqus", "utterances", "giscus", "custom", "none"], default: "disqus" }
+        - { label: "Comments Shortname", name: "comments_shortname", widget: "string", required: false }
+        - { label: "Enable Table of Contents", name: "enable_toc", widget: "boolean", default: true }
+        - { label: "TOC Depth", name: "toc_depth", widget: "number", value_type: "int", min: 2, max: 6, default: 3 }
+        - { label: "Show Progress Bar", name: "show_progress_bar", widget: "boolean", default: true }
+        - { label: "Auto Generate Excerpts", name: "auto_excerpt", widget: "boolean", default: true }
+        - { label: "Excerpt Length", name: "excerpt_length", widget: "number", value_type: "int", default: 160 }
+        - { label: "Show Featured Image in Post", name: "show_featured_image", widget: "boolean", default: true }
+        - { label: "Featured Image Position", name: "featured_image_position", widget: "select", options: ["top", "right", "left", "none"], default: "top" }
+        - { label: "Show Next/Prev Navigation", name: "show_post_nav", widget: "boolean", default: true }
+        - { label: "Enable Infinite Scroll", name: "infinite_scroll", widget: "boolean", default: false }
+        - { label: "Archive Layout", name: "archive_layout", widget: "select", options: ["grid", "list", "masonry"], default: "grid" }
+
+    # =======================
+    # 7.29.5 SEO SETTINGS
+    # =======================
+    - label: "SEO Settings"
+      name: "seo"
+      file: "content/settings/seo.json"
+      fields:
+        - { label: "Default Meta Title", name: "default_meta_title", widget: "string", required: true }
+        - { label: "Default Meta Description", name: "default_meta_description", widget: "text", required: true }
+        - { label: "Default Meta Image", name: "default_meta_image", widget: "image", required: false }
+        - { label: "Site Name", name: "site_name", widget: "string", required: true }
+        - { label: "Twitter Username", name: "twitter_username", widget: "string", required: false }
+        - { label: "Facebook App ID", name: "facebook_app_id", widget: "string", required: false }
+        - { label: "Facebook Page URL", name: "facebook_page_url", widget: "string", required: false }
+        - { label: "Twitter Site", name: "twitter_site", widget: "string", required: false }
+        - { label: "Twitter Creator", name: "twitter_creator", widget: "string", required: false }
+        - { label: "Default Open Graph Type", name: "og_type", widget: "select", options: ["website", "article", "book", "profile"], default: "website" }
+        - { label: "Default Twitter Card Type", name: "twitter_card", widget: "select", options: ["summary", "summary_large_image", "app", "player"], default: "summary_large_image" }
+        - { label: "Enable JSON-LD Structured Data", name: "enable_structured_data", widget: "boolean", default: true }
+        - { 
+            label: "Organization Schema", 
+            name: "organization_schema", 
+            widget: "object",
+            fields: 
+              - { label: "Organization Name", name: "name", widget: "string" }
+              - { label: "Organization URL", name: "url", widget: "string" }
+              - { label: "Logo", name: "logo", widget: "string" }
+              - { label: "Description", name: "description", widget: "text" }
+              - { 
+                  label: "Social Profiles", 
+                  name: "same_as", 
+                  widget: "list",
+                  required: false
+                }
+          }
+        - { label: "Enable Breadcrumb Schema", name: "enable_breadcrumb_schema", widget: "boolean", default: true }
+        - { label: "Enable Article Schema", name: "enable_article_schema", widget: "boolean", default: true }
+        - { label: "Enable Sitemap", name: "enable_sitemap", widget: "boolean", default: true }
+        - { label: "Sitemap Change Frequency", name: "sitemap_changefreq", widget: "select", options: ["always", "hourly", "daily", "weekly", "monthly", "yearly", "never"], default: "weekly" }
+        - { label: "Sitemap Priority", name: "sitemap_priority", widget: "number", value_type: "float", min: 0, max: 1, default: 0.5 }
+        - { label: "Robots.txt Content", name: "robots_txt", widget: "text", required: false }
+        - { label: "Enable Canonical URLs", name: "enable_canonical", widget: "boolean", default: true }
+        - { label: "Noindex Certain Pages", name: "noindex_pages", widget: "list", required: false, hint: "e.g., /search, /admin" }
+        - { label: "Google Site Verification", name: "google_site_verification", widget: "string", required: false }
+        - { label: "Bing Site Verification", name: "bing_site_verification", widget: "string", required: false }
+        - { label: "Yandex Site Verification", name: "yandex_site_verification", widget: "string", required: false }
+
+    # =======================
+    # 7.29.6 ANALYTICS SETTINGS
+    # =======================
+    - label: "Analytics"
+      name: "analytics"
+      file: "content/settings/analytics.json"
+      fields:
+        - { label: "Google Analytics ID", name: "google_analytics_id", widget: "string", required: false, hint: "UA-XXXXXXXXX-X or G-XXXXXXXXXX" }
+        - { label: "Google Analytics 4 ID", name: "google_analytics_4_id", widget: "string", required: false, hint: "G-XXXXXXXXXX" }
+        - { label: "Google Tag Manager ID", name: "google_tag_manager_id", widget: "string", required: false, hint: "GTM-XXXXXX" }
+        - { label: "Facebook Pixel ID", name: "facebook_pixel_id", widget: "string", required: false }
+        - { label: "LinkedIn Insight Tag", name: "linkedin_insight_tag", widget: "string", required: false }
+        - { label: "Twitter Pixel ID", name: "twitter_pixel_id", widget: "string", required: false }
+        - { label: "Hotjar Site ID", name: "hotjar_site_id", widget: "string", required: false }
+        - { label: "Microsoft Clarity ID", name: "microsoft_clarity_id", widget: "string", required: false }
+        - { label: "Enable Analytics in Development", name: "analytics_in_dev", widget: "boolean", default: false }
+        - { label: "Respect Do Not Track", name: "respect_dnt", widget: "boolean", default: true }
+        - { label: "Anonymize IP", name: "anonymize_ip", widget: "boolean", default: true }
+        - { label: "Enable Performance Tracking", name: "performance_tracking", widget: "boolean", default: true }
+        - { label: "Enable Error Tracking", name: "error_tracking", widget: "boolean", default: true }
+        - { label: "Sentry DSN", name: "sentry_dsn", widget: "string", required: false }
+        - { label: "Enable A/B Testing", name: "enable_ab_testing", widget: "boolean", default: false }
+        - { label: "A/B Testing Platform", name: "ab_testing_platform", widget: "select", options: ["google_optimize", "optimizely", "vwo", "custom"], default: "google_optimize" }
+        - { label: "Google Optimize ID", name: "google_optimize_id", widget: "string", required: false }
+        - { label: "Optimizely Project ID", name: "optimizely_project_id", widget: "string", required: false }
+        - { label: "VWO Account ID", name: "vwo_account_id", widget: "string", required: false }
+
+    # =======================
+    # 7.29.7 EMAIL SETTINGS
+    # =======================
+    - label: "Email Settings"
+      name: "email"
+      file: "content/settings/email.json"
+      fields:
+        - { label: "SMTP Host", name: "smtp_host", widget: "string", required: false }
+        - { label: "SMTP Port", name: "smtp_port", widget: "number", value_type: "int", required: false }
+        - { label: "SMTP Username", name: "smtp_username", widget: "string", required: false }
+        - { label: "SMTP Password", name: "smtp_password", widget: "string", required: false, hint: "Will be stored securely" }
+        - { label: "SMTP Encryption", name: "smtp_encryption", widget: "select", options: ["none", "ssl", "tls"], default: "tls" }
+        - { label: "From Email", name: "from_email", widget: "string", required: true }
+        - { label: "From Name", name: "from_name", widget: "string", required: true }
+        - { label: "Reply To Email", name: "reply_to_email", widget: "string", required: false }
+        - { label: "BCC Email", name: "bcc_email", widget: "string", required: false }
+        - { label: "Email Service", name: "email_service", widget: "select", options: ["smtp", "sendgrid", "mailgun", "amazon_ses", "postmark"], default: "smtp" }
+        - { label: "SendGrid API Key", name: "sendgrid_api_key", widget: "string", required: false }
+        - { label: "Mailgun Domain", name: "mailgun_domain", widget: "string", required: false }
+        - { label: "Mailgun API Key", name: "mailgun_api_key", widget: "string", required: false }
+        - { label: "Amazon SES Access Key", name: "amazon_ses_access_key", widget: "string", required: false }
+        - { label: "Amazon SES Secret Key", name: "amazon_ses_secret_key", widget: "string", required: false }
+        - { label: "Amazon SES Region", name: "amazon_ses_region", widget: "string", required: false }
+        - { label: "Postmark API Token", name: "postmark_api_token", widget: "string", required: false }
+        - { label: "Enable Email Tracking", name: "email_tracking", widget: "boolean", default: false }
+        - { label: "Enable Unsubscribe Link", name: "unsubscribe_link", widget: "boolean", default: true }
+        - { label: "Email Footer", name: "email_footer", widget: "text", required: false }
+        - { label: "Company Address in Footer", name: "company_address_footer", widget: "boolean", default: true }
+
+    # =======================
+    # 7.29.8 SECURITY SETTINGS
+    # =======================
+    - label: "Security"
+      name: "security"
+      file: "content/settings/security.json"
+      fields:
+        - { label: "Enable HTTPS", name: "enable_https", widget: "boolean", default: true }
+        - { label: "HSTS Enabled", name: "hsts_enabled", widget: "boolean", default: true }
+        - { label: "HSTS Max Age", name: "hsts_max_age", widget: "number", value_type: "int", default: 31536000 }
+        - { label: "Enable CSP", name: "enable_csp", widget: "boolean", default: true }
+        - { label: "CSP Policy", name: "csp_policy", widget: "text", required: false }
+        - { label: "Enable X-Frame-Options", name: "enable_x_frame_options", widget: "boolean", default: true }
+        - { label: "X-Frame-Options Value", name: "x_frame_options", widget: "select", options: ["DENY", "SAMEORIGIN"], default: "SAMEORIGIN" }
+        - { label: "Enable X-Content-Type-Options", name: "enable_x_content_type_options", widget: "boolean", default: true }
+        - { label: "Enable Referrer-Policy", name: "enable_referrer_policy", widget: "boolean", default: true }
+        - { label: "Referrer Policy", name: "referrer_policy", widget: "select", options: ["no-referrer", "no-referrer-when-downgrade", "origin", "origin-when-cross-origin", "same-origin", "strict-origin", "strict-origin-when-cross-origin", "unsafe-url"], default: "strict-origin-when-cross-origin" }
+        - { label: "Enable Permissions-Policy", name: "enable_permissions_policy", widget: "boolean", default: true }
+        - { label: "Permissions Policy", name: "permissions_policy", widget: "text", required: false }
+        - { label: "Enable CSRF Protection", name: "enable_csrf", widget: "boolean", default: true }
+        - { label: "Enable Rate Limiting", name: "enable_rate_limiting", widget: "boolean", default: true }
+        - { label: "Rate Limit Requests", name: "rate_limit_requests", widget: "number", value_type: "int", default: 100 }
+        - { label: "Rate Limit Window (minutes)", name: "rate_limit_window", widget: "number", value_type: "int", default: 15 }
+        - { label: "Enable Login Attempt Limiting", name: "enable_login_limiting", widget: "boolean", default: true }
+        - { label: "Max Login Attempts", name: "max_login_attempts", widget: "number", value_type: "int", default: 5 }
+        - { label: "Login Lockout Duration (minutes)", name: "login_lockout_duration", widget: "number", value_type: "int", default: 15 }
+        - { label: "Enable 2FA", name: "enable_2fa", widget: "boolean", default: false }
+        - { label: "Password Minimum Length", name: "password_min_length", widget: "number", value_type: "int", default: 8 }
+        - { label: "Password Complexity", name: "password_complexity", widget: "select", options: ["low", "medium", "high"], default: "medium" }
+        - { label: "Session Timeout (minutes)", name: "session_timeout", widget: "number", value_type: "int", default: 30 }
+        - { label: "Enable Audit Logging", name: "enable_audit_logging", widget: "boolean", default: true }
+        - { label: "Audit Log Retention (days)", name: "audit_log_retention", widget: "number", value_type: "int", default: 90 }
+        - { label: "Enable File Upload Validation", name: "enable_file_validation", widget: "boolean", default: true }
+        - { label: "Allowed File Types", name: "allowed_file_types", widget: "list", default: ["jpg", "jpeg", "png", "gif", "pdf", "doc", "docx"] }
+        - { label: "Max File Size (MB)", name: "max_file_size", widget: "number", value_type: "int", default: 10 }
+        - { label: "Enable Security Headers", name: "enable_security_headers", widget: "boolean", default: true }
+
+    # =======================
+    # 7.29.9 CACHE SETTINGS
+    # =======================
+    - label: "Cache Settings"
+      name: "cache"
+      file: "content/settings/cache.json"
+      fields:
+        - { label: "Enable Caching", name: "enable_caching", widget: "boolean", default: true }
+        - { label: "Cache Strategy", name: "cache_strategy", widget: "select", options: ["static", "dynamic", "hybrid"], default: "hybrid" }
+        - { label: "Cache Duration (seconds)", name: "cache_duration", widget: "number", value_type: "int", default: 3600 }
+        - { label: "Browser Cache Duration (seconds)", name: "browser_cache_duration", widget: "number", value_type: "int", default: 86400 }
+        - { label: "Enable CDN Caching", name: "enable_cdn_caching", widget: "boolean", default: false }
+        - { label: "CDN Cache Duration (seconds)", name: "cdn_cache_duration", widget: "number", value_type: "int", default: 86400 }
+        - { label: "Enable Cache Purging", name: "enable_cache_purging", widget: "boolean", default: true }
+        - { label: "Auto-purge on Update", name: "auto_purge_on_update", widget: "boolean", default: true }
+        - { label: "Purge Method", name: "purge_method", widget: "select", options: ["soft", "hard", "smart"], default: "smart" }
+        - { label: "Cache Exclusions", name: "cache_exclusions", widget: "list", required: false, hint: "URL patterns to exclude from caching" }
+        - { label: "Enable Compression", name: "enable_compression", widget: "boolean", default: true }
+        - { label: "Compression Level", name: "compression_level", widget: "select", options: ["low", "medium", "high"], default: "medium" }
+        - { label: "Enable Minification", name: "enable_minification", widget: "boolean", default: true }
+        - { label: "Minify CSS", name: "minify_css", widget: "boolean", default: true }
+        - { label: "Minify JavaScript", name: "minify_js", widget: "boolean", default: true }
+        - { label: "Minify HTML", name: "minify_html", widget: "boolean", default: true }
+        - { label: "Enable Image Optimization", name: "enable_image_optimization", widget: "boolean", default: true }
+        - { label: "Image Quality", name: "image_quality", widget: "number", value_type: "int", min: 1, max: 100, default: 85 }
+        - { label: "Enable Lazy Loading", name: "enable_lazy_loading", widget: "boolean", default: true }
+        - { label: "Lazy Loading Threshold", name: "lazy_loading_threshold", widget: "number", value_type: "int", default: 300, hint: "Pixels from viewport to start loading" }
+
+    # =======================
+    # 7.29.10 INTEGRATION SETTINGS
+    # =======================
+    - label: "Integrations"
+      name: "integrations"
+      file: "content/settings/integrations.json"
+      fields:
+        - { label: "Enable Webhooks", name: "enable_webhooks", widget: "boolean", default: true }
+        - { 
+            label: "Webhooks", 
+            name: "webhooks", 
+            widget: "list",
+            fields: 
+              - { label: "Webhook Name", name: "name", widget: "string" }
+              - { label: "URL", name: "url", widget: "string" }
+              - { label: "Event", name: "event", widget: "select", options: ["post_published", "post_updated", "form_submitted", "user_registered"] }
+              - { label: "Method", name: "method", widget: "select", options: ["POST", "PUT", "GET"], default: "POST" }
+              - { label: "Headers", name: "headers", widget: "object", fields: [] }
+              - { label: "Active", name: "active", widget: "boolean", default: true }
+          }
+        - { label: "Enable Zapier Integration", name: "enable_zapier", widget: "boolean", default: false }
+        - { label: "Zapier Webhook URL", name: "zapier_webhook_url", widget: "string", required: false }
+        - { label: "Enable Make Integration", name: "enable_make", widget: "boolean", default: false }
+        - { label: "Make Webhook URL", name: "make_webhook_url", widget: "string", required: false }
+        - { label: "Enable Slack Integration", name: "enable_slack", widget: "boolean", default: false }
+        - { label: "Slack Webhook URL", name: "slack_webhook_url", widget: "string", required: false }
+        - { label: "Slack Channel", name: "slack_channel", widget: "string", required: false }
+        - { label: "Enable Discord Integration", name: "enable_discord", widget: "boolean", default: false }
+        - { label: "Discord Webhook URL", name: "discord_webhook_url", widget: "string", required: false }
+        - { label: "Enable Microsoft Teams Integration", name: "enable_teams", widget: "boolean", default: false }
+        - { label: "Teams Webhook URL", name: "teams_webhook_url", widget: "string", required: false }
+        - { label: "Enable Google Calendar Integration", name: "enable_google_calendar", widget: "boolean", default: false }
+        - { label: "Google Calendar API Key", name: "google_calendar_api_key", widget: "string", required: false }
+        - { label: "Google Calendar ID", name: "google_calendar_id", widget: "string", required: false }
+        - { label: "Enable Google Maps Integration", name: "enable_google_maps", widget: "boolean", default: false }
+        - { label: "Google Maps API Key", name: "google_maps_api_key", widget: "string", required: false }
+        - { label: "Enable Stripe Integration", name: "enable_stripe", widget: "boolean", default: false }
+        - { label: "Stripe Publishable Key", name: "stripe_publishable_key", widget: "string", required: false }
+        - { label: "Stripe Secret Key", name: "stripe_secret_key", widget: "string", required: false }
+        - { label: "Enable PayPal Integration", name: "enable_paypal", widget: "boolean", default: false }
+        - { label: "PayPal Client ID", name: "paypal_client_id", widget: "string", required: false }
+        - { label: "PayPal Secret", name: "paypal_secret", widget: "string", required: false }
+        - { label: "Enable Mailchimp Integration", name: "enable_mailchimp", widget: "boolean", default: false }
+        - { label: "Mailchimp API Key", name: "mailchimp_api_key", widget: "string", required: false }
+        - { label: "Mailchimp List ID", name: "mailchimp_list_id", widget: "string", required: false }
+        - { label: "Enable HubSpot Integration", name: "enable_hubspot", widget: "boolean", default: false }
+        - { label: "HubSpot API Key", name: "hubspot_api_key", widget: "string", required: false }
+        - { label: "Enable Salesforce Integration", name: "enable_salesforce", widget: "boolean", default: false }
+        - { label: "Salesforce Client ID", name: "salesforce_client_id", widget: "string", required: false }
+        - { label: "Salesforce Client Secret", name: "salesforce_client_secret", widget: "string", required: false }
+        - { label: "Enable AWS Integration", name: "enable_aws", widget: "boolean", default: false }
+        - { label: "AWS Access Key ID", name: "aws_access_key_id", widget: "string", required: false }
+        - { label: "AWS Secret Access Key", name: "aws_secret_access_key", widget: "string", required: false }
+        - { label: "AWS Region", name: "aws_region", widget: "string", required: false }
+
+    # =======================
+    # 7.29.11 BACKUP SETTINGS
+    # =======================
+    - label: "Backup & Recovery"
+      name: "backup"
+      file: "content/settings/backup.json"
+      fields:
+        - { label: "Enable Auto Backups", name: "enable_auto_backups", widget: "boolean", default: true }
+        - { label: "Backup Frequency", name: "backup_frequency", widget: "select", options: ["hourly", "daily", "weekly", "monthly"], default: "daily" }
+        - { label: "Backup Time", name: "backup_time", widget: "string", default: "02:00" }
+        - { label: "Backup Retention (days)", name: "backup_retention", widget: "number", value_type: "int", default: 30 }
+        - { label: "Backup Content", name: "backup_content", widget: "boolean", default: true }
+        - { label: "Backup Media", name: "backup_media", widget: "boolean", default: true }
+        - { label: "Backup Database", name: "backup_database", widget: "boolean", default: true }
+        - { label: "Backup Configuration", name: "backup_config", widget: "boolean", default: true }
+        - { label: "Backup Storage", name: "backup_storage", widget: "select", options: ["local", "s3", "google_drive", "dropbox"], default: "local" }
+        - { label: "S3 Bucket Name", name: "s3_bucket_name", widget: "string", required: false }
+        - { label: "S3 Region", name: "s3_region", widget: "string", required: false }
+        - { label: "Google Drive Folder ID", name: "google_drive_folder_id", widget: "string", required: false }
+        - { label: "Dropbox Folder Path", name: "dropbox_folder_path", widget: "string", required: false }
+        - { label: "Enable Email Notifications", name: "enable_backup_notifications", widget: "boolean", default: true }
+        - { label: "Notification Email", name: "backup_notification_email", widget: "string", required: false }
+        - { label: "Encrypt Backups", name: "encrypt_backups", widget: "boolean", default: true }
+        - { label: "Encryption Password", name: "encryption_password", widget: "string", required: false, hint: "Will be stored securely" }
+        - { label: "Enable Auto Recovery", name: "enable_auto_recovery", widget: "boolean", default: false }
+        - { label: "Recovery Point Objective (hours)", name: "recovery_point_objective", widget: "number", value_type: "int", default: 24 }
+        - { label: "Recovery Time Objective (minutes)", name: "recovery_time_objective", widget: "number", value_type: "int", default: 60 }
+
+    # =======================
+    # 7.29.12 MAINTENANCE SETTINGS
+    # =======================
+    - label: "Maintenance"
+      name: "maintenance"
+      file: "content/settings/maintenance.json"
+      fields:
+        - { label: "Maintenance Mode", name: "maintenance_mode", widget: "boolean", default: false }
+        - { label: "Maintenance Message", name: "maintenance_message", widget: "text", default: "We're currently performing maintenance. Please check back soon." }
+        - { label: "Maintenance Page Title", name: "maintenance_page_title", widget: "string", default: "Under Maintenance" }
+        - { label: "Maintenance Start Time", name: "maintenance_start", widget: "datetime", required: false }
+        - { label: "Maintenance End Time", name: "maintenance_end", widget: "datetime", required: false }
+        - { label: "Allow Access to IPs", name: "allowed_ips", widget: "list", required: false, hint: "IP addresses that can access site during maintenance" }
+        - { label: "Enable Scheduled Maintenance", name: "enable_scheduled_maintenance", widget: "boolean", default: false }
+        - { label: "Maintenance Schedule", name: "maintenance_schedule", widget: "text", required: false, hint: "Cron expression or description" }
+        - { label: "Auto Updates", name: "auto_updates", widget: "boolean", default: false }
+        - { label: "Update Notification", name: "update_notification", widget: "boolean", default: true }
+        - { label: "Update Backup", name: "update_backup", widget: "boolean", default: true }
+        - { label: "Health Check Enabled", name: "health_check_enabled", widget: "boolean", default: true }
+        - { label: "Health Check Interval (minutes)", name: "health_check_interval", widget: "number", value_type: "int", default: 5 }
+        - { label: "Health Check Endpoints", name: "health_check_endpoints", widget: "list", required: false }
+        - { label: "Error Reporting", name: "error_reporting", widget: "boolean", default: true }
+        - { label: "Error Reporting Email", name: "error_reporting_email", widget: "string", required: false }
+        - { label: "Log Retention (days)", name: "log_retention", widget: "number", value_type: "int", default: 30 }
+        - { label: "Log Level", name: "log_level", widget: "select", options: ["debug", "info", "warn", "error"], default: "info" }
+
+    # =======================
+    # 7.29.13 CUSTOMIZATION SETTINGS
+    # =======================
+    - label: "Customization"
+      name: "customization"
+      file: "content/settings/customization.json"
+      fields:
+        - { label: "Primary Color", name: "primary_color", widget: "color", default: "#3B82F6" }
+        - { label: "Secondary Color", name: "secondary_color", widget: "color", default: "#10B981" }
+        - { label: "Accent Color", name: "accent_color", widget: "color", default: "#8B5CF6" }
+        - { label: "Background Color", name: "background_color", widget: "color", default: "#FFFFFF" }
+        - { label: "Text Color", name: "text_color", widget: "color", default: "#1F2937" }
+        - { label: "Link Color", name: "link_color", widget: "color", default: "#3B82F6" }
+        - { label: "Button Radius", name: "button_radius", widget: "number", value_type: "int", default: 8 }
+        - { label: "Font Family", name: "font_family", widget: "string", default: "system-ui, -apple-system, sans-serif" }
+        - { label: "Heading Font", name: "heading_font", widget: "string", required: false }
+        - { label: "Body Font", name: "body_font", widget: "string", required: false }
+        - { label: "Font Size Base", name: "font_size_base", widget: "string", default: "16px" }
+        - { label: "Line Height", name: "line_height", widget: "number", value_type: "float", default: 1.6 }
+        - { label: "Container Width", name: "container_width", widget: "string", default: "1200px" }
+        - { label: "Container Padding", name: "container_padding", widget: "string", default: "1rem" }
+        - { label: "Enable Dark Mode", name: "enable_dark_mode", widget: "boolean", default: true }
+        - { label: "Dark Mode Primary Color", name: "dark_primary_color", widget: "color", default: "#60A5FA" }
+        - { label: "Dark Mode Background", name: "dark_background", widget: "color", default: "#111827" }
+        - { label: "Dark Mode Text", name: "dark_text", widget: "color", default: "#F9FAFB" }
+        - { label: "Custom CSS", name: "custom_css", widget: "code", default_language: "css", required: false }
+        - { label: "Custom JavaScript", name: "custom_js", widget: "code", default_language: "javascript", required: false }
+        - { label: "Header Scripts", name: "header_scripts", widget: "code", default_language: "html", required: false }
+        - { label: "Footer Scripts", name: "footer_scripts", widget: "code", default_language: "html", required: false }
+        - { label: "Favicon Code", name: "favicon_code", widget: "code", default_language: "html", required: false }
+        - { label: "Custom 404 Page", name: "custom_404", widget: "markdown", required: false }
+        - { label: "Custom 500 Page", name: "custom_500", widget: "markdown", required: false }
+
+    # =======================
+    # 7.29.14 USER ROLES & PERMISSIONS
+    # =======================
+    - label: "User Roles"
+      name: "user_roles"
+      file: "content/settings/user_roles.json"
+      fields:
+        - { 
+            label: "Roles", 
+            name: "roles", 
+            widget: "list",
+            fields: 
+              - { label: "Role Name", name: "name", widget: "string" }
+              - { label: "Role Slug", name: "slug", widget: "string" }
+              - { label: "Description", name: "description", widget: "text" }
+              - { 
+                  label: "Permissions", 
+                  name: "permissions", 
+                  widget: "object",
+                  fields: 
+                    - { label: "Create Posts", name: "create_posts", widget: "boolean", default: false }
+                    - { label: "Edit Posts", name: "edit_posts", widget: "boolean", default: false }
+                    - { label: "Delete Posts", name: "delete_posts", widget: "boolean", default: false }
+                    - { label: "Publish Posts", name: "publish_posts", widget: "boolean", default: false }
+                    - { label: "Create Pages", name: "create_pages", widget: "boolean", default: false }
+                    - { label: "Edit Pages", name: "edit_pages", widget: "boolean", default: false }
+                    - { label: "Delete Pages", name: "delete_pages", widget: "boolean", default: false }
+                    - { label: "Manage Media", name: "manage_media", widget: "boolean", default: false }
+                    - { label: "Manage Users", name: "manage_users", widget: "boolean", default: false }
+                    - { label: "Manage Settings", name: "manage_settings", widget: "boolean", default: false }
+                    - { label: "Manage Comments", name: "manage_comments", widget: "boolean", default: false }
+                    - { label: "View Analytics", name: "view_analytics", widget: "boolean", default: false }
+                    - { label: "Export Data", name: "export_data", widget: "boolean", default: false }
+                    - { label: "Import Data", name: "import_data", widget: "boolean", default: false }
+              }
+          }
+        - { 
+            label: "Default Role", 
+            name: "default_role", 
+            widget: "select",
+            options: ["administrator", "editor", "author", "contributor", "subscriber"],
+            default: "subscriber"
+          }
+        - { label: "Allow Registration", name: "allow_registration", widget: "boolean", default: false }
+        - { label: "Require Email Verification", name: "require_email_verification", widget: "boolean", default: true }
+        - { label: "Require Admin Approval", name: "require_admin_approval", widget: "boolean", default: true }
+        - { label: "Minimum Password Length", name: "min_password_length", widget: "number", value_type: "int", default: 8 }
+        - { label: "Password Expiry (days)", name: "password_expiry", widget: "number", value_type: "int", default: 90 }
+        - { label: "Max Login Attempts", name: "max_login_attempts", widget: "number", value_type: "int", default: 5 }
+        - { label: "Lockout Duration (minutes)", name: "lockout_duration", widget: "number", value_type: "int", default: 15 }
+
+    # =======================
+    # 7.29.15 NOTIFICATION SETTINGS
+    # =======================
+    - label: "Notifications"
+      name: "notifications"
+      file: "content/settings/notifications.json"
+      fields:
+        - { label: "Enable Email Notifications", name: "enable_email_notifications", widget: "boolean", default: true }
+        - { label: "Enable In-App Notifications", name: "enable_in_app_notifications", widget: "boolean", default: true }
+        - { label: "Enable Browser Notifications", name: "enable_browser_notifications", widget: "boolean", default: false }
+        - { label: "Enable Push Notifications", name: "enable_push_notifications", widget: "boolean", default: false }
+        - { 
+            label: "Notification Types", 
+            name: "notification_types", 
+            widget: "list",
+            fields: 
+              - { label: "Type", name: "type", widget: "select", options: ["new_comment", "new_user", "post_published", "form_submission", "system_alert"] }
+              - { label: "Email", name: "email", widget: "boolean", default: true }
+              - { label: "In-App", name: "in_app", widget: "boolean", default: true }
+              - { label: "Browser", name: "browser", widget: "boolean", default: false }
+              - { label: "Push", name: "push", widget: "boolean", default: false }
+          }
+        - { label: "Admin Email for Notifications", name: "admin_notification_email", widget: "string", required: true }
+        - { label: "Notification Frequency", name: "notification_frequency", widget: "select", options: ["immediate", "hourly", "daily", "weekly"], default: "immediate" }
+        - { label: "Digest Time", name: "digest_time", widget: "string", default: "09:00" }
+        - { label: "Enable Digest Email", name: "enable_digest_email", widget: "boolean", default: true }
+        - { label: "Digest Days", name: "digest_days", widget: "list", options: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"], default: ["monday", "wednesday", "friday"] }
+        - { label: "Enable Mobile Notifications", name: "enable_mobile_notifications", widget: "boolean", default: false }
+        - { label: "Mobile Notification Service", name: "mobile_notification_service", widget: "select", options: ["firebase", "onesignal", "pushwoosh", "custom"], default: "firebase" }
+        - { label: "Firebase Server Key", name: "firebase_server_key", widget: "string", required: false }
+        - { label: "OneSignal App ID", name: "onesignal_app_id", widget: "string", required: false }
+        - { label: "Pushwoosh Application Code", name: "pushwoosh_application_code", widget: "string", required: false }
+
+    # =======================
+    # 7.29.16 API SETTINGS
+    # =======================
+    - label: "API Settings"
+      name: "api"
+      file: "content/settings/api.json"
+      fields:
+        - { label: "Enable REST API", name: "enable_rest_api", widget: "boolean", default: true }
+        - { label: "Enable GraphQL API", name: "enable_graphql_api", widget: "boolean", default: false }
+        - { label: "API Version", name: "api_version", widget: "string", default: "v1" }
+        - { label: "API Base Path", name: "api_base_path", widget: "string", default: "/api" }
+        - { label: "Enable API Authentication", name: "enable_api_auth", widget: "boolean", default: true }
+        - { label: "Authentication Methods", name: "auth_methods", widget: "select", multiple: true, options: ["api_key", "jwt", "oauth2", "basic"], default: ["api_key", "jwt"] }
+        - { label: "API Key Header", name: "api_key_header", widget: "string", default: "X-API-Key" }
+        - { label: "JWT Secret", name: "jwt_secret", widget: "string", required: false, hint: "Will be generated automatically" }
+        - { label: "JWT Expiry (hours)", name: "jwt_expiry", widget: "number", value_type: "int", default: 24 }
+        - { label: "Enable Rate Limiting", name: "enable_api_rate_limiting", widget: "boolean", default: true }
+        - { label: "Rate Limit", name: "api_rate_limit", widget: "number", value_type: "int", default: 100 }
+        - { label: "Rate Limit Window (minutes)", name: "api_rate_limit_window", widget: "number", value_type: "int", default: 15 }
+        - { label: "Enable API Logging", name: "enable_api_logging", widget: "boolean", default: true }
+        - { label: "API Log Retention (days)", name: "api_log_retention", widget: "number", value_type: "int", default: 30 }
+        - { label: "Enable API Documentation", name: "enable_api_docs", widget: "boolean", default: true }
+        - { label: "API Documentation Path", name: "api_docs_path", widget: "string", default: "/api-docs" }
+        - { label: "Enable CORS", name: "enable_cors", widget: "boolean", default: true }
+        - { label: "CORS Origins", name: "cors_origins", widget: "list", required: false, hint: "Allowed origins for CORS" }
+        - { label: "Enable API Cache", name: "enable_api_cache", widget: "boolean", default: true }
+        - { label: "API Cache Duration (seconds)", name: "api_cache_duration", widget: "number", value_type: "int", default: 300 }
+        - { label: "Enable Webhooks", name: "enable_api_webhooks", widget: "boolean", default: false }
+        - { label: "Webhook Secret", name: "webhook_secret", widget: "string", required: false }
+        - { label: "Enable API Versioning", name: "enable_api_versioning", widget: "boolean", default: true }
+        - { label: "Deprecated API Versions", name: "deprecated_api_versions", widget: "list", required: false }
+
+    # =======================
+    # 7.29.17 TRANSLATION SETTINGS
+    # =======================
+    - label: "Translations"
+      name: "translations"
+      file: "content/settings/translations.json"
+      fields:
+        - { label: "Enable Multilingual", name: "enable_multilingual", widget: "boolean", default: false }
+        - { label: "Default Language", name: "default_language", widget: "select", options: ["en", "es", "fr", "de", "ja", "zh", "ru", "ar"], default: "en" }
+        - { 
+            label: "Supported Languages", 
+            name: "supported_languages", 
+            widget: "list",
+            fields: 
+              - { label: "Language Code", name: "code", widget: "string" }
+              - { label: "Language Name", name: "name", widget: "string" }
+              - { label: "Locale", name: "locale", widget: "string" }
+              - { label: "Direction", name: "direction", widget: "select", options: ["ltr", "rtl"], default: "ltr" }
+              - { label: "Enabled", name: "enabled", widget: "boolean", default: true }
+              - { label: "Default", name: "default", widget: "boolean", default: false }
+          }
+        - { label: "Auto Translation", name: "auto_translation", widget: "boolean", default: false }
+        - { label: "Translation Service", name: "translation_service", widget: "select", options: ["google", "deepl", "microsoft", "custom"], default: "google" }
+        - { label: "Google Translate API Key", name: "google_translate_api_key", widget: "string", required: false }
+        - { label: "DeepL API Key", name: "deepl_api_key", widget: "string", required: false }
+        - { label: "Microsoft Translator Key", name: "microsoft_translator_key", widget: "string", required: false }
+        - { label: "Enable Language Switcher", name: "enable_language_switcher", widget: "boolean", default: true }
+        - { label: "Language Switcher Position", name: "language_switcher_position", widget: "select", options: ["header", "footer", "both"], default: "header" }
+        - { label: "Show Language Names", name: "show_language_names", widget: "boolean", default: true }
+        - { label: "Show Language Flags", name: "show_language_flags", widget: "boolean", default: true }
+        - { label: "Enable Hreflang Tags", name: "enable_hreflang", widget: "boolean", default: true }
+        - { label: "Enable Language Detection", name: "enable_language_detection", widget: "boolean", default: true }
+        - { label: "Fallback Language", name: "fallback_language", widget: "select", options: ["en", "es", "fr"], default: "en" }
+        - { label: "Enable Translation Memory", name: "enable_translation_memory", widget: "boolean", default: false }
+        - { label: "Translation Memory Size", name: "translation_memory_size", widget: "number", value_type: "int", default: 1000 }
+
+    # =======================
+    # 7.29.18 GDPR/PRIVACY SETTINGS
+    # =======================
+    - label: "GDPR & Privacy"
+      name: "gdpr"
+      file: "content/settings/gdpr.json"
+      fields:
+        - { label: "Enable GDPR Compliance", name: "enable_gdpr", widget: "boolean", default: true }
+        - { label: "Privacy Policy URL", name: "privacy_policy_url", widget: "string", required: true }
+        - { label: "Terms of Service URL", name: "terms_of_service_url", widget: "string", required: true }
+        - { label: "Cookie Policy URL", name: "cookie_policy_url", widget: "string", required: true }
+        - { label: "Enable Cookie Consent", name: "enable_cookie_consent", widget: "boolean", default: true }
+        - { label: "Cookie Consent Position", name: "cookie_consent_position", widget: "select", options: ["top", "bottom", "top-left", "top-right", "bottom-left", "bottom-right"], default: "bottom" }
+        - { label: "Cookie Consent Theme", name: "cookie_consent_theme", widget: "select", options: ["light", "dark", "minimal"], default: "light" }
+        - { label: "Cookie Expiry (days)", name: "cookie_expiry", widget: "number", value_type: "int", default: 365 }
+        - { label: "Required Cookies", name: "required_cookies", widget: "list", required: false, hint: "Cookies that are essential for the site to function" }
+        - { label: "Analytics Cookies", name: "analytics_cookies", widget: "list", required: false }
+        - { label: "Marketing Cookies", name: "marketing_cookies", widget: "list", required: false }
+        - { label: "Enable "DNT" Support", name: "enable_dnt", widget: "boolean", default: true }
+        - { label: "Data Retention Period (months)", name: "data_retention_period", widget: "number", value_type: "int", default: 24 }
+        - { label: "Enable Data Export", name: "enable_data_export", widget: "boolean", default: true }
+        - { label: "Enable Data Deletion", name: "enable_data_deletion", widget: "boolean", default: true }
+        - { label: "Data Processing Agreements", name: "data_processing_agreements", widget: "list", required: false }
+        - { label: "Data Protection Officer Email", name: "dpo_email", widget: "string", required: false }
+        - { label: "Enable Privacy by Design", name: "privacy_by_design", widget: "boolean", default: true }
+        - { label: "Enable Privacy Impact Assessment", name: "privacy_impact_assessment", widget: "boolean", default: false }
+        - { label: "Data Breach Notification", name: "data_breach_notification", widget: "boolean", default: true }
+        - { label: "Data Breach Notification Time (hours)", name: "data_breach_notification_time", widget: "number", value_type: "int", default: 72 }
+
+    # =======================
+    # 7.29.19 ACCESSIBILITY SETTINGS
+    # =======================
+    - label: "Accessibility"
+      name: "accessibility"
+      file: "content/settings/accessibility.json"
+      fields:
+        - { label: "Enable Accessibility Features", name: "enable_accessibility", widget: "boolean", default: true }
+        - { label: "Skip to Main Content", name: "skip_to_main_content", widget: "boolean", default: true }
+        - { label: "Enable High Contrast Mode", name: "enable_high_contrast", widget: "boolean", default: true }
+        - { label: "Enable Large Text Mode", name: "enable_large_text", widget: "boolean", default: true }
+        - { label: "Enable Keyboard Navigation", name: "enable_keyboard_navigation", widget: "boolean", default: true }
+        - { label: "Keyboard Navigation Shortcuts", name: "keyboard_shortcuts", widget: "boolean", default: true }
+        - { label: "Enable Screen Reader Support", name: "enable_screen_reader", widget: "boolean", default: true }
+        - { label: "ARIA Landmarks", name: "aria_landmarks", widget: "boolean", default: true }
+        - { label: "Alternative Text Required", name: "alt_text_required", widget: "boolean", default: true }
+        - { label: "Color Contrast Check", name: "color_contrast_check", widget: "boolean", default: true }
+        - { label: "Minimum Contrast Ratio", name: "min_contrast_ratio", widget: "number", value_type: "float", default: 4.5 }
+        - { label: "Focus Visible", name: "focus_visible", widget: "boolean", default: true }
+        - { label: "Focus Outline Color", name: "focus_outline_color", widget: "color", default: "#3B82F6" }
+        - { label: "Enable Reduced Motion", name: "enable_reduced_motion", widget: "boolean", default: true }
+        - { label: "Enable Dyslexia Font", name: "enable_dyslexia_font", widget: "boolean", default: false }
+        - { label: "Dyslexia Font Family", name: "dyslexia_font_family", widget: "string", default: "OpenDyslexic, sans-serif" }
+        - { label: "Enable Accessibility Statement", name: "enable_accessibility_statement", widget: "boolean", default: true }
+        - { label: "Accessibility Statement URL", name: "accessibility_statement_url", widget: "string", required: false }
+        - { label: "WCAG Compliance Level", name: "wcag_level", widget: "select", options: ["A", "AA", "AAA"], default: "AA" }
+        - { label: "Accessibility Testing", name: "accessibility_testing", widget: "boolean", default: false }
+        - { label: "Testing Tools", name: "testing_tools", widget: "list", required: false, hint: "e.g., axe, lighthouse, wave" }
+        - { label: "Regular Testing Schedule", name: "testing_schedule", widget: "select", options: ["weekly", "monthly", "quarterly", "annually"], default: "quarterly" }
+
+    # =======================
+    # 7.29.20 MONETIZATION SETTINGS
+    # =======================
+    - label: "Monetization"
+      name: "monetization"
+      file: "content/settings/monetization.json"
+      fields:
+        - { label: "Enable Monetization", name: "enable_monetization", widget: "boolean", default: false }
+        - { label: "Monetization Method", name: "monetization_method", widget: "select", options: ["ads", "subscriptions", "donations", "affiliate", "sponsorships", "products"], default: "ads" }
+        - { label: "Ad Network", name: "ad_network", widget: "select", options: ["google_adsense", "media.net", "adthrive", "ezoic", "monumetric", "custom"], default: "google_adsense" }
+        - { label: "Google AdSense Publisher ID", name: "adsense_publisher_id", widget: "string", required: false }
+        - { label: "Google AdSense Client ID", name: "adsense_client_id", widget: "string", required: false }
+        - { label: "Ad Placement", name: "ad_placement", widget: "select", options: ["auto", "manual", "both"], default: "auto" }
+        - { label: "Enable Auto Ads", name: "enable_auto_ads", widget: "boolean", default: true }
+        - { label: "Ad Positions", name: "ad_positions", widget: "list", 
+            fields: 
+              - { label: "Position", name: "position", widget: "select", options: ["header", "sidebar", "footer", "content_top", "content_middle", "content_bottom", "between_posts"] }
+              - { label: "Enabled", name: "enabled", widget: "boolean", default: true }
+              - { label: "Ad Code", name: "ad_code", widget: "code", default_language: "html" }
+          }
+        - { label: "Enable Affiliate Marketing", name: "enable_affiliate", widget: "boolean", default: false }
+        - { label: "Affiliate Networks", name: "affiliate_networks", widget: "list", required: false, hint: "e.g., Amazon Associates, ShareASale, Commission Junction" }
+        - { label: "Affiliate Disclosure", name: "affiliate_disclosure", widget: "text", required: false }
+        - { label: "Enable Donations", name: "enable_donations", widget: "boolean", default: false }
+        - { label: "Donation Platform", name: "donation_platform", widget: "select", options: ["paypal", "stripe", "patreon", "buy_me_a_coffee", "ko_fi", "custom"], default: "paypal" }
+        - { label: "PayPal Donation Email", name: "paypal_donation_email", widget: "string", required: false }
+        - { label: "Stripe Donation Key", name: "stripe_donation_key", widget: "string", required: false }
+        - { label: "Patreon URL", name: "patreon_url", widget: "string", required: false }
+        - { label: "Enable Subscriptions", name: "enable_subscriptions", widget: "boolean", default: false }
+        - { label: "Subscription Platform", name: "subscription_platform", widget: "select", options: ["stripe", "paypal", "memberful", "ghost", "custom"], default: "stripe" }
+        - { label: "Stripe Subscription Key", name: "stripe_subscription_key", widget: "string", required: false }
+        - { label: "Subscription Tiers", name: "subscription_tiers", widget: "list", 
+            fields: 
+              - { label: "Tier Name", name: "name", widget: "string" }
+              - { label: "Price", name: "price", widget: "number", value_type: "float" }
+              - { label: "Billing Period", name: "billing_period", widget: "select", options: ["monthly", "yearly", "one-time"] }
+              - { label: "Features", name: "features", widget: "list" }
+          }
+        - { label: "Enable Sponsorships", name: "enable_sponsorships", widget: "boolean", default: false }
+        - { label: "Sponsorship Contact Email", name: "sponsorship_contact", widget: "string", required: false }
+        - { label: "Sponsorship Packages", name: "sponsorship_packages", widget: "list", required: false }
+        - { label: "Enable E-commerce", name: "enable_ecommerce", widget: "boolean", default: false }
+        - { label: "E-commerce Platform", name: "ecommerce_platform", widget: "select", options: ["shopify", "woocommerce", "bigcommerce", "custom"], default: "custom" }
+        - { label: "Shopify Store URL", name: "shopify_store_url", widget: "string", required: false }
+        - { label: "Enable Analytics for Monetization", name: "enable_monetization_analytics", widget: "boolean", default: true } 
