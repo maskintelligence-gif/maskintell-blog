@@ -1,0 +1,19 @@
+backend:
+  name: github
+  repo: maskintelligence-gif/maskintell-blog  # Change this to your repo
+  branch: main  # or master, depending on your default branch
+
+media_folder: "images/uploads"  # Where uploaded images will be stored
+public_folder: "/images/uploads"  # Public URL path
+
+collections:
+  - name: "blog"  # Used in routes
+    label: "Blog"  # Used in the UI
+    folder: "content/blog"  # Where blog posts are stored
+    create: true  # Allow users to create new posts
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"  # Filename template
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      - { label: "Body", name: "body", widget: "markdown" }
+      - { label: "Featured Image", name: "thumbnail", widget: "image" }
