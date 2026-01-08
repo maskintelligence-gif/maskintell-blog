@@ -1,19 +1,24 @@
 backend:
   name: github
-  repo: maskintelligence-gif/maskintell-blog  # Change this to your repo
-  branch: main  # or master, depending on your default branch
+  repo: maskintelligence-gif/maskintell-blog  # Your actual repo
+  branch: main
+  base_url: https://api.netlify.com  # Netlify's OAuth endpoint
+  auth_endpoint: auth  # Netlify's auth path
 
-media_folder: "images/uploads"  # Where uploaded images will be stored
-public_folder: "/images/uploads"  # Public URL path
+media_folder: "static/images/uploads"  # Adjust based on your static folder
+public_folder: "/images/uploads"
 
 collections:
-  - name: "blog"  # Used in routes
-    label: "Blog"  # Used in the UI
-    folder: "content/blog"  # Where blog posts are stored
-    create: true  # Allow users to create new posts
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"  # Filename template
+  - name: "posts"
+    label: "Blog Posts"
+    folder: "content/posts"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Publish Date", name: "date", widget: "datetime" }
+      - { label: "Author", name: "author", widget: "string" }
+      - { label: "Category", name: "category", widget: "string", required: false }
+      - { label: "Tags", name: "tags", widget: "list", required: false }
+      - { label: "Featured Image", name: "thumbnail", widget: "image", required: false }
       - { label: "Body", name: "body", widget: "markdown" }
-      - { label: "Featured Image", name: "thumbnail", widget: "image" }
