@@ -8,410 +8,116 @@ show_in_menu: true
 menu_order: 0
 published: true
 ---
-<!DOCTYPE html>
+# Terms of Services - [Mask Intelligence](https://mask-intelligence.web.app)
 
-<html lang="en">
+By accessing or using this website and any services provided by Mask Intelligence, you agree to be bound by these Terms of Service.
 
-<head>
+---
 
-    <meta charset="UTF-8">
+### 📋 Acceptance of Terms
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+These Terms of Service ("Terms") govern your access to and use of the Mask Intelligence website, products, and services ("Services"). By accessing or using our Services, you agree to be bound by these Terms.
 
-    <title>Terms of Service - Mask Intelligence</title>
+Important: If you do not agree to these Terms, you must not access or use our Services. Your continued use of the Services constitutes your acceptance of any revised Terms.
 
-    <style>
+These Terms apply to all visitors, users, and others who access or use the Services. Additional terms may apply to specific services, which will be presented to you when you access those services.
 
-        /\* Minimal essential styling for readability \*/
+---
 
-        body {
+### 🤝 Use of services
 
-            font-family: Arial, sans-serif;
+You agree to use our website and Services responsibly and in compliance with all applicable laws, regulations, and these Terms.
 
-            line-height: 1.6;
+✅ Permitted Use:
 
-            color: #333;
+You may use our Services for lawful purposes only and in accordance with these Terms.
 
-            max-width: 800px;
+❌ Prohibited Activities:
 
-            margin: 0 auto;
+You agree not to:
 
-            padding: 20px;
+· Use the Services in any way that violates any applicable law or regulation
 
-        }
+· Engage in any conduct that restricts or inhibits anyone's use of the Services
 
-        
+· Attempt to gain unauthorized access to any part of the Services
 
-        h1 {
+· Introduce any viruses or malicious code to the Services
 
-            color: #2c3e50;
+· Use the Services to transmit any unsolicited commercial communications
 
-            border-bottom: 3px solid #3498db;
+· Impersonate any person or entity, or falsely state your affiliation
 
-            padding-bottom: 10px;
+Mask Intelligence reserves the right to refuse service, terminate accounts, or remove content at our sole discretion if we believe you have violated these Terms or applicable laws.
 
-        }
+---
 
-        
+### ⚠️ No Guarantees
 
-        h2 {
+Our Services and all information, content, and materials are provided "as is" and "as available" without any warranties of any kind.
 
-            color: #2980b9;
+Service Availability Disclaimer:
 
-            border-left: 4px solid #2ecc71;
+While we strive to provide reliable Services, we do not guarantee that:
 
-            padding-left: 10px;
+· The Services will be available uninterrupted or error-free
 
-            margin-top: 30px;
+· Any specific results will be obtained from using the Services
 
-        }
+· Defects will be corrected within any specific timeframe
 
-        
+· The Services will meet your specific requirements
 
-        .notice {
+· The content is accurate, complete, or current
 
-            background: #f8f9fa;
+To the fullest extent permitted by applicable law, Mask Intelligence disclaims all warranties, express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, and non-infringement.
 
-            border-left: 4px solid #e74c3c;
+---
 
-            padding: 15px;
+### ⚖️ Limitation of Liability
 
-            margin: 20px 0;
+To the maximum extent permitted by applicable law, Mask Intelligence shall not be liable for any direct, indirect, incidental, special, consequential, or punitive damages resulting from:
 
-        }
+· Your use or inability to use the Services
 
-        
+· Any unauthorized access to or use of our servers and/or any personal information stored therein
 
-        .warning {
+· Any interruption or cessation of transmission to or from our Services
 
-            background: #fff3cd;
+· Any bugs, viruses, or the like that may be transmitted to or through our Services
 
-            border: 1px solid #ffeaa7;
+· Any errors or omissions in any content or for any loss or damage incurred as a result of the use of any content
 
-            padding: 15px;
+· The defamatory, offensive, or illegal conduct of any third party
 
-            margin: 20px 0;
+This limitation of liability applies whether the alleged liability is based on contract, tort, negligence, strict liability, or any other basis, even if Mask Intelligence has been advised of the possibility of such damage.
 
-            border-radius: 4px;
+Maximum Liability:
 
-        }
+In jurisdictions that do not allow the exclusion or limitation of liability for consequential or incidental damages, our liability shall be limited to the maximum extent permitted by law, but in no event shall it exceed $100 USD.
 
-        
+---
 
-        .highlight {
+### 🔁 Changes Of Terms
 
-            background: #e8f4f8;
+We reserve the right to modify or replace these Terms at any time at our sole discretion. If we make material changes, we will provide notice through the Services or by other means.
 
-            padding: 15px;
+Notification of Changes:
 
-            margin: 20px 0;
+When we update these Terms, we will revise the "Last Updated" date. Your continued use of the Services after any such changes constitutes your acceptance of the new Terms.
 
-            border: 1px solid #b3e0f2;
+We encourage you to review these Terms periodically for any changes. If you do not agree to the updated Terms, you must discontinue using the Services.
 
-        }
+Mask Intelligence may also, in the future, offer new services and/or features through the website. Such new features and/or services shall be subject to these Terms of Service.
 
-        
+---
 
-        footer {
+### 📞 Contact Information
 
-            margin-top: 40px;
+If you have any questions about these Terms, please contact us through the methods provided on our website.
 
-            padding-top: 20px;
+Note: These Terms constitute the entire agreement between you and Mask Intelligence regarding our Services and supersede any prior agreements.
 
-            border-top: 2px solid #ecf0f1;
+---
 
-            text-align: center;
-
-            color: #7f8c8d;
-
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-<!-- Header Section -->
-
-<header>
-
-    <table width="100%" cellpadding="10" style="background: linear-gradient(to right, #3498db, #2ecc71); color: white; border-radius: 5px;">
-
-        <tr>
-
-            <td align="center">
-
-                <h1 style="color: white; margin: 0;">📜 Terms of Service</h1>
-
-                <p style="margin: 5px 0 0 0; font-size: 1.1em;">Mask Intelligence</p>
-
-            </td>
-
-        </tr>
-
-    </table>
-
-</header>
-
-<!-- Last Updated Info -->
-
-<div align="center" style="margin: 20px 0; padding: 10px; background: #ecf0f1; border-radius: 5px;">
-
-    <strong>📅 Last Updated:</strong> <span id="date"></span>
-
-    <script>document.getElementById('date').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });</script>
-
-</div>
-
-<!-- Quick Navigation -->
-
-<div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-
-    <strong>🔍 Quick Navigation:</strong>
-
-    <a href="#acceptance" style="margin: 0 10px; color: #2980b9; text-decoration: none;">Acceptance</a> •
-
-    <a href="#use" style="margin: 0 10px; color: #2980b9; text-decoration: none;">Use of Services</a> •
-
-    <a href="#guarantees" style="margin: 0 10px; color: #2980b9; text-decoration: none;">No Guarantees</a> •
-
-    <a href="#liability" style="margin: 0 10px; color: #2980b9; text-decoration: none;">Liability</a> •
-
-    <a href="#changes" style="margin: 0 10px; color: #2980b9; text-decoration: none;">Changes</a>
-
-</div>
-
-<!-- Agreement Notice -->
-
-<div class="notice">
-
-    <table width="100%">
-
-        <tr>
-
-            <td width="40" valign="top">⚠️</td>
-
-            <td>
-
-                <strong>By accessing or using this website and any services provided by Mask Intelligence, you agree to be bound by these Terms of Service.</strong>
-
-            </td>
-
-        </tr>
-
-    </table>
-
-</div>
-
-<!-- Acceptance of Terms -->
-
-<h2 id="acceptance">✅ Acceptance of Terms</h2>
-
-<p>These Terms of Service ("Terms") govern your access to and use of the Mask Intelligence website, products, and services ("Services").</p>
-
-<div class="warning">
-
-    <table width="100%">
-
-        <tr>
-
-            <td width="40" valign="top">❗</td>
-
-            <td>
-
-                <strong>Important:</strong> If you do not agree to these Terms, you must not access or use our Services. Your continued use of the Services constitutes your acceptance of any revised Terms.
-
-            </td>
-
-        </tr>
-
-    </table>
-
-</div>
-
-<!-- Use of Services -->
-
-<h2 id="use">🤝 Use of Services</h2>
-
-<p>You agree to use our website and Services responsibly and in compliance with all applicable laws.</p>
-
-<table width="100%" cellpadding="15" style="background: #e8f6f3; border-radius: 5px; margin: 15px 0;">
-
-    <tr>
-
-        <td valign="top" width="50%">
-
-            <strong style="color: #27ae60;">✅ Permitted Use:</strong><br>
-
-            You may use our Services for lawful purposes only.
-
-        </td>
-
-        <td valign="top" width="50%">
-
-            <strong style="color: #e74c3c;">❌ Prohibited Activities:</strong><br>
-
-            • Illegal activities<br>
-
-            • Unauthorized access<br>
-
-            • Disruptive behavior
-
-        </td>
-
-    </tr>
-
-</table>
-
-<!-- No Guarantees -->
-
-<h2 id="guarantees">⚠️ No Guarantees</h2>
-
-<p>Services and information are provided "as is" without warranties of any kind.</p>
-
-<div class="highlight">
-
-    <table width="100%">
-
-        <tr>
-
-            <td width="40" valign="top">🔍</td>
-
-            <td>
-
-                <strong>We do not guarantee:</strong>
-
-                <ul>
-
-                    <li>Uninterrupted availability</li>
-
-                    <li>Specific results</li>
-
-                    <li>Error-free operation</li>
-
-                    <li>Meeting specific requirements</li>
-
-                </ul>
-
-            </td>
-
-        </tr>
-
-    </table>
-
-</div>
-
-<!-- Limitation of Liability -->
-
-<h2 id="liability">⚖️ Limitation of Liability</h2>
-
-<p>Mask Intelligence shall not be liable for damages resulting from the use or inability to use this website or its content.</p>
-
-<table border="1" cellpadding="10" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 15px 0; border-color: #f39c12;">
-
-    <tr style="background: #fef9e7;">
-
-        <td align="center">
-
-            <strong>Maximum Liability</strong><br>
-
-            In no event shall liability exceed<br>
-
-            <span style="font-size: 1.2em; color: #e74c3c;">$100 USD</span>
-
-        </td>
-
-    </tr>
-
-</table>
-
-<!-- Changes to Terms -->
-
-<h2 id="changes">🔄 Changes to Terms</h2>
-
-<p>These terms may be updated as services evolve. Continued use indicates acceptance.</p>
-
-<table width="100%" cellpadding="15" style="background: linear-gradient(to right, #d6eaf8, #d1f2eb); border-radius: 5px; margin: 15px 0;">
-
-    <tr>
-
-        <td align="center">
-
-            <strong>📢 Notification Process:</strong><br>
-
-            We will notify users of material changes through:
-
-            <br><br>
-
-            <span style="background: white; padding: 5px 15px; border-radius: 20px; margin: 0 5px;">Website Notice</span>
-
-            <span style="background: white; padding: 5px 15px; border-radius: 20px; margin: 0 5px;">Email</span>
-
-            <span style="background: white; padding: 5px 15px; border-radius: 20px; margin: 0 5px;">In-Service Alert</span>
-
-        </td>
-
-    </tr>
-
-</table>
-
-<!-- Contact Information -->
-
-<h2>📞 Contact Information</h2>
-
-<table width="100%" cellpadding="20" style="background: #f4f6f6; border-radius: 5px;">
-
-    <tr>
-
-        <td align="center">
-
-            <strong>Questions about these Terms?</strong><br>
-
-            Contact us through the methods provided on our website.
-
-        </td>
-
-    </tr>
-
-</table>
-
-<!-- Footer -->
-
-<footer>
-
-    <table width="100%" cellpadding="20" style="background: #2c3e50; color: white; border-radius: 5px;">
-
-        <tr>
-
-            <td align="center">
-
-                <p style="margin: 0;">
-
-                    &copy; <span id="year"></span> Mask Intelligence. All rights reserved.<br>
-
-                    <small style="color: #bdc3c7;">By using our services, you agree to these Terms of Service.</small>
-
-                </p>
-
-                <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
-
-            </td>
-
-        </tr>
-
-    </table>
-
-</footer>
-
-<!-- Back to Top -->
-
-<div align="center" style="margin-top: 20px;">
-
-    <a href="#" style="text-decoration: none; color: #3498db; padding: 10px 20px; border: 1px solid #3498db; border-radius: 5px;">↑ Back to Top</a>
-
-</div>
-
-</body>
-
-</html>
+##### [**Mask Intelligence**](Mask-Intelligence.web.app). All rights reserved.
