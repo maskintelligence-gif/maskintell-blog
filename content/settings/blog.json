@@ -1,0 +1,7 @@
+{
+  "posts_per_page": 10,
+  "show_author_info": true,
+  "show_reading_time": true,
+  "show_share_buttons": true,
+  "comments_system": "none"
+}
