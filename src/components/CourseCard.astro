@@ -1,0 +1,15 @@
+---
+const { course } = Astro.props;
+---
+
+<article class="course-card" itemscope itemtype="https://schema.org/Course">
+  <img src={course.image} alt={course.title} />
+
+  <h3 itemprop="name">{course.title}</h3>
+  <p>{course.short_description}</p>
+
+  <p><strong>Level:</strong> {course.difficulty}</p>
+  <p><strong>Duration:</strong> {course.duration}</p>
+
+  <a href={`/courses/${course.slug}`}>View Course →</a>
+</article>
