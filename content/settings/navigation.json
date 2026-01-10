@@ -19,6 +19,11 @@
       "label": "About us",
       "link": "/about",
       "new_tab": false
+    },
+    {
+      "label": "Contacts",
+      "link": "/contacts",
+      "new_tab": false
     }
   ],
   "footer_menu": [
