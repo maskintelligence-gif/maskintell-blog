@@ -61,6 +61,21 @@ const canonical =
 
     <section class="post-body">
       <AstroMarkdown content={post.body} />
+
+   <script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": post.title,
+  "description": post.excerpt,
+  "datePublished": post.date,
+  "author": {
+    "@type": "Organization",
+    "name": "MASK Intelligence"
+  }
+})}
+</script>
+
     </section>
 
   </article>
