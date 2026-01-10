@@ -1,0 +1,28 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import JobCard from "../../components/JobCard.astro";
+
+const jobs = await Astro.glob("../../content/jobs/*.md");
+
+const published = jobs
+  .map(j => j.frontmatter)
+  .filter(j => j.published !== false)
+  .sort((a, b) =>
+    new Date(b.deadline || 0) - new Date(a.deadline || 0)
+  );
+---
+
+<BaseLayout
+  title="Careers"
+  description="Join the MASK Intelligence team."
+>
+  <section class="container">
+    <h1>Careers</h1>
+
+    <div class="grid">
+      {published.map(job => (
+        <JobCard job={job} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>
