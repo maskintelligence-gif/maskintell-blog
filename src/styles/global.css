@@ -511,3 +511,18 @@ a:hover {
   color: var(--primary);
   background: transparent;
 }
+
+.breadcrumbs {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.breadcrumbs li::after {
+  content: "›";
+  margin-left: 0.5rem;
+}
+
+.breadcrumbs li:last-child::after {
+  content: "";
+}
