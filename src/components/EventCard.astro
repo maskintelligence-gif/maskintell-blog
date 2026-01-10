@@ -1,0 +1,12 @@
+---
+const { event } = Astro.props;
+---
+
+<article class="event-card" itemscope itemtype="https://schema.org/Event">
+  <img src={event.image} alt={event.title} />
+
+  <h3 itemprop="name">{event.title}</h3>
+  <time itemprop="startDate">{event.start_date}</time>
+
+  <a href={`/events/${event.slug}`}>View Event →</a>
+</article>
