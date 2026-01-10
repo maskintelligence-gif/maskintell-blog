@@ -1,0 +1,51 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const files = await Astro.glob("../../content/jobs/*.md");
+  return files.map(f => ({
+    params: { slug: f.frontmatter.slug },
+    props: { job: f }
+  }));
+}
+
+const { job } = Astro.props;
+const j = job.frontmatter;
+---
+
+<BaseLayout title={j.title} description={j.description}>
+  <article
+    class="container"
+    itemscope
+    itemtype="https://schema.org/JobPosting"
+  >
+    <h1 itemprop="title">{j.title}</h1>
+
+    <meta itemprop="employmentType" content={j.employment_type} />
+    <meta itemprop="jobLocationType" content={j.location} />
+
+    {j.salary_range && (
+      <p itemprop="baseSalary">{j.salary_range}</p>
+    )}
+
+    <section itemprop="description">
+      {j.description}
+    </section>
+
+    <h3>Requirements</h3>
+    <ul>
+      {j.requirements.map(req => (
+        <li>{req}</li>
+      ))}
+    </ul>
+
+    {j.deadline && (
+      <p>
+        <strong>Apply before:</strong>
+        <time itemprop="validThrough">
+          {j.deadline}
+        </time>
+      </p>
+    )}
+  </article>
+</BaseLayout>
