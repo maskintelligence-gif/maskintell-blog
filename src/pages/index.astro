@@ -3,6 +3,100 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout>
-  <h1>MASK Intelligence</h1>
-  <p>Site is live.</p>
+  <!-- HERO -->
+  <section class="hero">
+    <h1>MASK Intelligence</h1>
+    <p>
+      Applied intelligence, research, and secure digital systems.
+    </p>
+
+    <div class="hero-actions">
+      <a href="/whitepapers/" class="btn primary">Explore Whitepapers</a>
+      <a href="/contact/" class="btn secondary">Contact Us</a>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="feature">
+      <h3>Research & Whitepapers</h3>
+      <p>
+        In‑depth intelligence reports gated by secure access.
+      </p>
+      <a href="/whitepapers/">View Whitepapers →</a>
+    </div>
+
+    <div class="feature">
+      <h3>Secure Platform</h3>
+      <p>
+        Auth, gated downloads, and dashboards powered by Supabase.
+      </p>
+      <a href="/auth/login">Login →</a>
+    </div>
+
+    <div class="feature">
+      <h3>Community & Contact</h3>
+      <p>
+        Reach out for partnerships, consulting, or inquiries.
+      </p>
+      <a href="/contact/">Get in touch →</a>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2>Access Intelligence That Matters</h2>
+    <p>
+      Join our newsletter to receive exclusive reports and insights.
+    </p>
+    <a href="/whitepapers/" class="btn primary">Get Started</a>
+  </section>
 </BaseLayout>
+
+<style>
+.hero {
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.hero-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+  padding: 4rem 1rem;
+}
+
+.feature {
+  border: 1px solid #222;
+  padding: 1.5rem;
+}
+
+.cta {
+  padding: 4rem 1rem;
+  text-align: center;
+  background: #111;
+}
+
+.btn {
+  padding: 0.75rem 1.25rem;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.btn.primary {
+  background: #2563eb;
+  color: white;
+}
+
+.btn.secondary {
+  border: 1px solid #2563eb;
+  color: #2563eb;
+}
+</style>
