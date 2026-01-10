@@ -1,0 +1,25 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const files = await Astro.glob("../../content/products/*.md");
+  return files.map(f => ({
+    params: { slug: f.frontmatter.slug },
+    props: { product: f }
+  }));
+}
+
+const { product } = Astro.props;
+const p = product.frontmatter;
+---
+
+<BaseLayout title={p.title} description={p.short_description}>
+  <article class="container" itemscope itemtype="https://schema.org/Product">
+    <h1 itemprop="name">{p.title}</h1>
+    <img src={p.image} alt={p.title} itemprop="image" />
+
+    <div itemprop="description">{p.description}</div>
+
+    <p><strong>Price:</strong> {p.price} {p.currency}</p>
+  </article>
+</BaseLayout>
