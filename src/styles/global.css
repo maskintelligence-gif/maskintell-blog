@@ -526,3 +526,29 @@ a:hover {
 .breadcrumbs li:last-child::after {
   content: "";
 }
+
+.testimonial-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.testimonial-card {
+  background: var(--card-bg, #0f172a);
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.testimonial-author {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  align-items: center;
+}
+
+.testimonial-author img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
