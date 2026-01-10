@@ -38,6 +38,10 @@
     {
       "label": "Contact",
       "link": "/contact"
+    },
+    {
+      "label": "GitHub",
+      "link": "https://github.com/maskintelligence-gif"
     }
   ]
 }
