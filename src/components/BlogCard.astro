@@ -1,0 +1,25 @@
+---
+const { post } = Astro.props;
+const { title, excerpt, category, tags, slug } = post.data;
+---
+
+<article class="blog-card">
+  <a href={`/blog/${slug}/`}>
+    <h2>{title}</h2>
+    <p>{excerpt}</p>
+  </a>
+
+  <div class="pill-row">
+    {category && (
+      <a class="pill category" href={`/category/${category.toLowerCase()}/`}>
+        {category}
+      </a>
+    )}
+
+    {tags?.map(tag => (
+      <a class="pill tag" href={`/tag/${tag.toLowerCase()}/`}>
+        #{tag}
+      </a>
+    ))}
+  </div>
+</article>
