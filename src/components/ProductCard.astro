@@ -1,0 +1,17 @@
+---
+const { product } = Astro.props;
+---
+
+<article class="product-card" itemscope itemtype="https://schema.org/Product">
+  <img src={product.image} alt={product.title} itemprop="image" />
+
+  <h3 itemprop="name">{product.title}</h3>
+  <p>{product.short_description}</p>
+
+  <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+    <meta itemprop="priceCurrency" content={product.currency} />
+    <span itemprop="price">{product.price}</span>
+  </span>
+
+  <a href={`/products/${product.slug}`}>View Product →</a>
+</article>
