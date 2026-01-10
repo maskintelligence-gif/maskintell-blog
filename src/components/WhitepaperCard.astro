@@ -1,0 +1,61 @@
+---
+const { title, description, slug } = Astro.props;
+---
+
+<div class="whitepaper-card">
+  <h3>{title}</h3>
+  <p>{description}</p>
+
+  <form class="download-form">
+    <input
+      type="email"
+      name="email"
+      placeholder="Enter your email"
+      required
+    />
+    <button type="submit">Download</button>
+  </form>
+
+  <p class="status"></p>
+</div>
+
+<script type="module">
+  const form = document.currentScript.previousElementSibling;
+  const status = form.nextElementSibling;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    status.textContent = "Processing...";
+
+    const email = form.email.value;
+
+    const res = await fetch(
+      "https://cvziqzkbpcwjzvhbwtpk.supabase.co/functions/v1/whitepaper-download",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          whitepaper_slug: "{slug}",
+          source: "whitepapers-page"
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.download_url) {
+      window.location.href = data.download_url;
+    } else {
+      status.textContent = data.error || "Something went wrong.";
+    }
+  });
+</script>
+
+<style>
+.whitepaper-card {
+  padding: 1.5rem;
+  border: 1px solid #222;
+  margin-bottom: 1.5rem;
+}
+</style>
