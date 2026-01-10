@@ -392,3 +392,55 @@ a:hover {
   border-radius: var(--radius-sm);
   margin: 2rem 0;
 }
+
+/* =========================
+   SERVICES
+========================= */
+
+.services-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.service-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.service-icon img {
+  width: 48px;
+  height: 48px;
+}
+
+.service {
+  max-width: 900px;
+}
+
+.service-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.service-hero {
+  width: 100%;
+  border-radius: var(--radius);
+  margin: 2rem 0;
+}
+
+.service-intro {
+  font-size: 1.1rem;
+  opacity: 0.85;
+}
+
+.service-features-block ul {
+  columns: 2;
+  gap: 2rem;
+}
+
+.service-cta {
+  margin-top: 4rem;
+  padding: 3rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  text-align: center;
+}
