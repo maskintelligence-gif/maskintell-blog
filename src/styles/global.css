@@ -348,3 +348,47 @@ a:hover {
 .page-body li {
   margin: 0.5rem 0;
 }
+
+/* =========================
+   BLOG
+========================= */
+
+.excerpt {
+  opacity: 0.85;
+}
+
+.meta,
+.post-meta {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  margin-bottom: 1rem;
+}
+
+.post {
+  max-width: 820px;
+}
+
+.post-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.post-image {
+  width: 100%;
+  border-radius: var(--radius);
+  margin-top: 2rem;
+}
+
+.post-body {
+  line-height: 1.8;
+}
+
+.post-body h2 {
+  margin-top: 3rem;
+}
+
+.post-body img {
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  margin: 2rem 0;
+}
