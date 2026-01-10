@@ -1,0 +1,26 @@
+<div class="profile">
+  <h2>Your Profile</h2>
+  <p id="email">Loading...</p>
+</div>
+
+<script type="module">
+  import { supabase } from "/src/lib/supabase";
+
+  const emailEl = document.getElementById("email");
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    window.location.href = "/auth/login";
+  } else {
+    emailEl.textContent = `Email: ${user.email}`;
+  }
+</script>
+
+<style>
+.profile {
+  padding: 1.5rem;
+  border: 1px solid #222;
+  margin-bottom: 2rem;
+}
+</style>
