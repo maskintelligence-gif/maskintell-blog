@@ -9,6 +9,11 @@
       "label": "Services",
       "link": "/services",
       "new_tab": false
+    },
+    {
+      "label": "Blog",
+      "link": "/blog",
+      "new_tab": false
     }
   ],
   "footer_menu": [
