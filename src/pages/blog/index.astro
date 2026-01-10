@@ -1,16 +1,47 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import posts from "../../../content/posts";
+import { getCollection } from "astro:content";
 
 /* =========================
    FILTER & SORT POSTS
 ========================= */
+const posts = await getCollection("posts");
 const publishedPosts = posts
   .filter((post) => post.status === "published")
   .sort((a, b) => new Date(b.date) - new Date(a.date));
 ---
 
-<BaseLayout>
+<BaseLayout title="Blog">
+
+<input id="search" placeholder="Search posts..." />
+
+  <div id="posts">
+    {posts.map(post => (
+      <article
+        class="post"
+        data-title={post.data.title.toLowerCase()}
+        data-tags={post.data.tags?.join(",").toLowerCase()}
+      >
+        <BlogCard post={post} />
+      </article>
+    ))}
+  </div>
+
+<script>
+    const input = document.getElementById("search");
+    const posts = document.querySelectorAll(".post");
+
+    input.addEventListener("input", e => {
+      const q = e.target.value.toLowerCase();
+      posts.forEach(p => {
+        const match =
+          p.dataset.title.includes(q) ||
+          p.dataset.tags?.includes(q);
+        p.style.display = match ? "block" : "none";
+      });
+    });
+  </script>
 
   <section class="section container">
     <header class="page-header">
