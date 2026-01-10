@@ -1,8 +1,12 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import Profile from "../../components/Dashboard/Profile.astro";
+import Downloads from "../../components/Dashboard/Downloads.astro";
 ---
 
 <BaseLayout>
   <h1>Dashboard</h1>
-  <p>You are logged in.</p>
+
+  <Profile />
+  <Downloads />
 </BaseLayout>
