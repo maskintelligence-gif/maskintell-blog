@@ -1,0 +1,28 @@
+---
+const { testimonial } = Astro.props;
+---
+
+<article class="testimonial-card" itemscope itemtype="https://schema.org/Review">
+  <div class="testimonial-content">
+    <p itemprop="reviewBody">“{testimonial.body}”</p>
+  </div>
+
+  <footer class="testimonial-author">
+    {testimonial.photo && (
+      <img
+        src={testimonial.photo}
+        alt={testimonial.name}
+        loading="lazy"
+        itemprop="image"
+      />
+    )}
+
+    <div>
+      <strong itemprop="author">{testimonial.name}</strong>
+      {testimonial.position && <span>{testimonial.position}</span>}
+      {testimonial.company && <em>{testimonial.company}</em>}
+    </div>
+  </footer>
+
+  <meta itemprop="reviewRating" content={testimonial.rating ?? 5} />
+</article>
