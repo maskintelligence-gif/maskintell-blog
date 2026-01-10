@@ -591,3 +591,27 @@ a:hover {
   color: #9ca3af;
   font-weight: 600;
 }
+
+.faq-search {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.faq-category {
+  margin-bottom: 3rem;
+}
+
+.faq-item {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+}
