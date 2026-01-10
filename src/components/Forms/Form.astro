@@ -1,0 +1,86 @@
+---
+const { formType, title } = Astro.props;
+---
+
+<form class="site-form">
+  <h1>{title}</h1>
+
+  <input
+    type="email"
+    name="email"
+    placeholder="Your email"
+    required
+  />
+
+  <textarea
+    name="message"
+    placeholder="Your message"
+    rows="5"
+    required
+  ></textarea>
+
+  <button type="submit">Submit</button>
+
+  <p class="status"></p>
+</form>
+
+<script type="module">
+  const form = document.currentScript.previousElementSibling;
+  const status = form.querySelector(".status");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    status.textContent = "Sending...";
+
+    const payload = {
+      form_type: "{formType}",
+      email: form.email.value,
+      message: form.message.value
+    };
+
+    const res = await fetch(
+      "https://cvziqzkbpcwjzvhbwtpk.supabase.co/functions/v1/submit-form",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      status.textContent = "Form submitted successfully.";
+      form.reset();
+    } else {
+      status.textContent = data.error || "Submission failed.";
+    }
+  });
+</script>
+
+<style>
+.site-form {
+  max-width: 500px;
+  margin: 3rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+input,
+textarea {
+  padding: 0.75rem;
+}
+
+button {
+  padding: 0.75rem;
+  background: #16a34a;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.status {
+  margin-top: 0.5rem;
+}
+</style>
