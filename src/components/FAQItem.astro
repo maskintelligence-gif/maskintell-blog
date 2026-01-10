@@ -2,10 +2,20 @@
 const { faq } = Astro.props;
 ---
 
-<details class="faq-item" itemscope itemtype="https://schema.org/Question">
+<details
+  class="faq-item"
+  itemscope
+  itemtype="https://schema.org/Question"
+  data-category={faq.category || "General"}
+>
   <summary itemprop="name">{faq.question}</summary>
 
-  <div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
+  <div
+    class="answer"
+    itemprop="acceptedAnswer"
+    itemscope
+    itemtype="https://schema.org/Answer"
+  >
     <p itemprop="text">{faq.answer}</p>
   </div>
 </details>
