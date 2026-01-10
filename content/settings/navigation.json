@@ -4,6 +4,11 @@
       "label": "Home",
       "link": "/",
       "new_tab": false
+    },
+    {
+      "label": "Services",
+      "link": "/services",
+      "new_tab": false
     }
   ],
   "footer_menu": [
