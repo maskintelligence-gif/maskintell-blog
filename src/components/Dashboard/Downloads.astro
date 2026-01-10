@@ -1,0 +1,46 @@
+<div class="downloads">
+  <h2>Your Downloads</h2>
+  <ul id="download-list">
+    <li>Loading...</li>
+  </ul>
+</div>
+
+<script type="module">
+  import { supabase } from "/src/lib/supabase";
+
+  const list = document.getElementById("download-list");
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    window.location.href = "/auth/login";
+  }
+
+  const { data, error } = await supabase
+    .from("whitepaper_downloads")
+    .select("whitepaper_slug, created_at")
+    .eq("email", user.email)
+    .order("created_at", { ascending: false });
+
+  if (error || !data || data.length === 0) {
+    list.innerHTML = "<li>No downloads yet.</li>";
+  } else {
+    list.innerHTML = data.map(d => `
+      <li>
+        <strong>${d.whitepaper_slug}</strong>
+        <small>${new Date(d.created_at).toLocaleString()}</small>
+      </li>
+    `).join("");
+  }
+</script>
+
+<style>
+.downloads {
+  padding: 1.5rem;
+  border: 1px solid #222;
+}
+
+li {
+  margin-bottom: 0.75rem;
+}
+</style>
