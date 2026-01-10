@@ -1,0 +1,11 @@
+---
+const { faq } = Astro.props;
+---
+
+<details class="faq-item" itemscope itemtype="https://schema.org/Question">
+  <summary itemprop="name">{faq.question}</summary>
+
+  <div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
+    <p itemprop="text">{faq.answer}</p>
+  </div>
+</details>
