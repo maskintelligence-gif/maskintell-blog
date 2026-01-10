@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import WhitepaperCard from "../../components/WhitepaperCard.astro";
+
+/**
+ * Temporary static data.
+ * Later this can come from Supabase DB or CMS.
+ */
+const whitepapers = [
+  {
+    title: "AI Security 2026",
+    description: "Threats, risks, and protection strategies.",
+    slug: "ai-security-2026"
+  },
+  {
+    title: "Enterprise AI Governance",
+    description: "How companies control AI at scale.",
+    slug: "enterprise-ai-governance"
+  }
+];
+---
+
+<BaseLayout>
+  <h1>Whitepapers</h1>
+
+  {whitepapers.map(wp => (
+    <WhitepaperCard
+      title={wp.title}
+      description={wp.description}
+      slug={wp.slug}
+    />
+  ))}
+</BaseLayout>
