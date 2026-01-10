@@ -1,0 +1,22 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getTags } from "../../utils/taxonomy";
+
+const tags = await getTags();
+---
+
+<BaseLayout title="Tags">
+  <h1>Tags</h1>
+
+  <div class="tags">
+    {tags.map(tag => (
+      <a
+        href={`/tags/${tag.slug}`}
+        class="tag"
+        style={`background:${tag.data.color ?? "#6B7280"}`}
+      >
+        {tag.data.title}
+      </a>
+    ))}
+  </div>
+</BaseLayout>
