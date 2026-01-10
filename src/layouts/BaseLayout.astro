@@ -1,82 +1,67 @@
 ---
 /* =========================
-   GLOBAL STYLES
+   IMPORTS
 ========================= */
 import "../styles/global.css";
-import Header from "../components/Header.astro";
 
 /* =========================
-   LOAD CMS SETTINGS
+   CMS SETTINGS
 ========================= */
 import general from "../../content/settings/general.json";
 import seo from "../../content/settings/seo.json";
 import analytics from "../../content/settings/analytics.json";
 import gdpr from "../../content/settings/gdpr.json";
 import navigation from "../../content/settings/navigation.json";
-import SEO from "../components/SEO.astro";
-
 
 /* =========================
    FALLBACKS
 ========================= */
-const siteTitle =
-  general.site_title || "MASK Intelligence";
-
+const siteTitle = general.site_title ?? "MASK Intelligence";
 const siteDescription =
-  general.site_description ||
-  "Engineering intelligent digital systems.";
+  general.site_description ?? "Engineering intelligent digital systems.";
 
-const metaTitle =
-  seo.default_meta_title || siteTitle;
-
+const metaTitle = seo.default_meta_title ?? siteTitle;
 const metaDescription =
-  seo.default_meta_description || siteDescription;
+  seo.default_meta_description ?? siteDescription;
 
-const metaImage =
-  seo.default_meta_image || "";
+const metaImage = seo.default_meta_image ?? "";
+const gaId = analytics.google_analytics_id ?? null;
 
-const gaId =
-  analytics.google_analytics_id;
+/* GitHub Pages base-safe URL */
+const base = Astro.site?.pathname ?? "/";
 ---
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- =====================
-         CORE META
-    ====================== -->
+    <!-- CORE META -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <title>{metaTitle}</title>
     <meta name="description" content={metaDescription} />
 
-    <!-- =====================
-         SEO / SOCIAL
-    ====================== -->
+    <!-- OPEN GRAPH -->
     <meta property="og:title" content={metaTitle} />
     <meta property="og:description" content={metaDescription} />
     <meta property="og:type" content="website" />
     {metaImage && <meta property="og:image" content={metaImage} />}
 
+    <!-- TWITTER -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={metaTitle} />
     <meta name="twitter:description" content={metaDescription} />
 
-    <!-- =====================
-         ICONS
-    ====================== -->
+    <!-- FAVICON -->
     {general.favicon && <link rel="icon" href={general.favicon} />}
 
-    <!-- =====================
-         GOOGLE ANALYTICS (GA4)
-    ====================== -->
+    <!-- GOOGLE ANALYTICS -->
     {gaId && (
       <>
         <script
           async
           src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
         ></script>
-        <script>
+        <script is:inline>
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -89,27 +74,23 @@ const gaId =
   </head>
 
   <body>
-    <!-- =====================
-         HEADER / NAVIGATION
-    ====================== -->
+    <!-- HEADER -->
     <header class="site-header">
       <div class="container header-inner">
-        <div class="brand">
-          <a href="/">
-            {general.logo ? (
-              <img src={general.logo} alt={siteTitle} />
-            ) : (
-              <span>{siteTitle}</span>
-            )}
-          </a>
-        </div>
+        <a class="brand" href={base}>
+          {general.logo ? (
+            <img src={general.logo} alt={siteTitle} />
+          ) : (
+            <span>{siteTitle}</span>
+          )}
+        </a>
 
         <nav class="main-nav">
           <ul>
             {navigation.main_menu?.map((item) => (
               <li>
                 <a
-                  href={item.link}
+                  href={`${base}${item.link.replace(/^\//, "")}`}
                   target={item.new_tab ? "_blank" : "_self"}
                   rel={item.new_tab ? "noopener noreferrer" : undefined}
                 >
@@ -122,29 +103,26 @@ const gaId =
       </div>
     </header>
 
-    <!-- =====================
-         MAIN CONTENT
-    ====================== -->
+    <!-- MAIN -->
     <main class="site-main">
       <slot />
     </main>
 
-    <!-- =====================
-         FOOTER
-    ====================== -->
+    <!-- FOOTER -->
     <footer class="site-footer">
       <div class="container footer-inner">
         <p>
-          © {new Date().getFullYear()}
-          {" "}
-          {general.company_name || siteTitle}
+          © {new Date().getFullYear()}{" "}
+          {general.company_name ?? siteTitle}
         </p>
 
         <nav class="footer-nav">
           <ul>
             {navigation.footer_menu?.map((item) => (
               <li>
-                <a href={item.link}>{item.label}</a>
+                <a href={`${base}${item.link.replace(/^\//, "")}`}>
+                  {item.label}
+                </a>
               </li>
             ))}
           </ul>
