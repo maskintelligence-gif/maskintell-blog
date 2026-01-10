@@ -9,7 +9,7 @@
   "footer_menu": [
     {
       "label": "Privacy policy",
-      "link": "https://maskintelligence-gif.github.io/maskintell-blog/privacy-policy"
+      "link": "/privacy-policy"
     }
   ]
 }
