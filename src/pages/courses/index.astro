@@ -1,0 +1,21 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CourseCard from "../../components/CourseCard.astro";
+
+const courses = await Astro.glob("../../content/courses/*.md");
+const published = courses
+  .map(c => c.frontmatter)
+  .filter(c => c.published);
+---
+
+<BaseLayout title="Courses" description="Learn with MASK Intelligence.">
+  <section class="container">
+    <h1>Courses</h1>
+
+    <div class="grid">
+      {published.map(course => (
+        <CourseCard course={course} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>
