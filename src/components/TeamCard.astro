@@ -1,0 +1,20 @@
+---
+const { member } = Astro.props;
+---
+
+<article class="team-card" itemscope itemtype="https://schema.org/Person">
+  {member.photo && (
+    <img src={member.photo} alt={member.name} itemprop="image" loading="lazy" />
+  )}
+
+  <h3 itemprop="name">{member.name}</h3>
+  <p itemprop="jobTitle">{member.position}</p>
+
+  {member.bio && <p class="bio">{member.bio}</p>}
+
+  <div class="socials">
+    {member.linkedin && <a href={member.linkedin}>LinkedIn</a>}
+    {member.twitter && <a href={member.twitter}>Twitter</a>}
+    {member.github && <a href={member.github}>GitHub</a>}
+  </div>
+</article>
