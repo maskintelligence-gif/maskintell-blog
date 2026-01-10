@@ -1,0 +1,35 @@
+---
+const { job } = Astro.props;
+
+const isExpired =
+  job.deadline && new Date(job.deadline) < new Date();
+---
+
+<article
+  class="job-card"
+  itemscope
+  itemtype="https://schema.org/JobPosting"
+>
+  <h3 itemprop="title">{job.title}</h3>
+
+  <p>
+    <strong>Type:</strong> {job.employment_type.replace("_", " ")}<br />
+    <strong>Location:</strong> {job.location}
+  </p>
+
+  {job.salary_range && (
+    <p><strong>Salary:</strong> {job.salary_range}</p>
+  )}
+
+  {job.deadline && (
+    <p class={isExpired ? "expired" : ""}>
+      Deadline: {job.deadline}
+    </p>
+  )}
+
+  {!isExpired ? (
+    <a href={`/jobs/${job.slug}`}>View Details →</a>
+  ) : (
+    <span class="closed">Position Closed</span>
+  )}
+</article>
