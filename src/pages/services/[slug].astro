@@ -1,0 +1,86 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import services from "../../../content/services";
+
+/* =========================
+   STATIC PATHS
+========================= */
+export async function getStaticPaths() {
+  return services
+    .filter((service) => service.status === "active")
+    .map((service) => ({
+      params: { slug: service.slug },
+      props: { service },
+    }));
+}
+
+/* =========================
+   CURRENT SERVICE
+========================= */
+const { service } = Astro.props;
+
+/* =========================
+   SEO
+========================= */
+const metaTitle =
+  service.seo_meta_title || service.title;
+
+const metaDescription =
+  service.seo_meta_description || service.short_description;
+
+const canonical =
+  service.canonical || `/services/${service.slug}`;
+---
+
+<BaseLayout>
+
+  <article class="service container">
+    <header class="service-header">
+      <h1>{service.title}</h1>
+
+      {service.hero_image && (
+        <img
+          src={service.hero_image}
+          alt={service.image_alt || service.title}
+          class="service-hero"
+        />
+      )}
+
+      {service.short_description && (
+        <p class="service-intro">
+          {service.short_description}
+        </p>
+      )}
+    </header>
+
+    <section class="service-body">
+      <AstroMarkdown content={service.body} />
+    </section>
+
+    {service.key_points?.length > 0 && (
+      <section class="service-features-block">
+        <h2>What’s Included</h2>
+        <ul>
+          {service.key_points.map((point) => (
+            <li>{point}</li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {service.cta && (
+      <section class="service-cta">
+        <h2>{service.cta.heading}</h2>
+        <p>{service.cta.text}</p>
+        <a
+          href={service.cta.link}
+          class="button primary"
+        >
+          {service.cta.label}
+        </a>
+      </section>
+    )}
+
+  </article>
+
+</BaseLayout>
