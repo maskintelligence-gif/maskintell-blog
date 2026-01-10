@@ -1,0 +1,11 @@
+---
+import Layout from "../layouts/BaseLayout.astro";
+import terms from "../../content/pages/terms-of-service.md";
+---
+
+<Layout>
+  <article class="legal-page container">
+    <h1>{terms.title}</h1>
+    <div set:html={terms.content} />
+  </article>
+</Layout>
