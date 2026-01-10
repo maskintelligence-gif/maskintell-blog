@@ -1,0 +1,11 @@
+---
+import Layout from "../layouts/BaseLayout.astro";
+import policy from "../../content/pages/privacy-policy.md";
+---
+
+<Layout>
+  <article class="legal-page container">
+    <h1>{policy.title}</h1>
+    <div set:html={policy.content} />
+  </article>
+</Layout>
