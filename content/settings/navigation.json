@@ -30,6 +30,10 @@
     {
       "label": "Privacy policy",
       "link": "/privacy-policy"
+    },
+    {
+      "label": "Terms of service",
+      "link": "/terms-of-services"
     }
   ]
 }
