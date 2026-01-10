@@ -1,0 +1,23 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import EventCard from "../../components/EventCard.astro";
+
+const events = await Astro.glob("../../content/events/*.md");
+
+const upcoming = events
+  .map(e => e.frontmatter)
+  .filter(e => new Date(e.end_date) >= new Date())
+  .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+---
+
+<BaseLayout title="Events" description="Upcoming workshops and webinars.">
+  <section class="container">
+    <h1>Events</h1>
+
+    <div class="grid">
+      {upcoming.map(event => (
+        <EventCard event={event} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>
