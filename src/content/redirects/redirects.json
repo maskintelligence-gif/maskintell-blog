@@ -1,0 +1,17 @@
+[
+  {
+    "from": "/old-blog-url",
+    "to": "/blog/new-url",
+    "status": 301
+  },
+  {
+    "from": "/careers",
+    "to": "/jobs",
+    "status": 301
+  },
+  {
+    "from": "/services/web-design",
+    "to": "/services/web",
+    "status": 302
+  }
+]
