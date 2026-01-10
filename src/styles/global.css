@@ -444,3 +444,42 @@ a:hover {
   border-radius: var(--radius);
   text-align: center;
 }
+
+/* =========================
+   PORTFOLIO
+========================= */
+
+.portfolio-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.portfolio-card img {
+  border-radius: var(--radius);
+}
+
+.portfolio {
+  max-width: 960px;
+}
+
+.portfolio-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.portfolio-hero {
+  width: 100%;
+  border-radius: var(--radius);
+  margin-top: 2rem;
+}
+
+.portfolio-tech ul,
+.portfolio-results ul {
+  columns: 2;
+  gap: 2rem;
+}
+
+.portfolio-links {
+  margin-top: 3rem;
+  display: flex;
+  gap: 1rem;
+}
