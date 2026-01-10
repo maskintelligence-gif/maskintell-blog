@@ -1,8 +1,116 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
----
 
+/* =========================
+   LOAD CMS HOMEPAGE SETTINGS
+========================= */
+import homepage from "../../content/settings/homepage.json";
+import services from "../../content/services";
+import portfolio from "../../content/portfolio";
+
+/* =========================
+   FILTER FEATURED CONTENT
+========================= */
+const featuredServices = services
+  ?.filter((s) => s.featured)
+  ?.sort((a, b) => (a.order || 0) - (b.order || 0))
+  ?.slice(0, 3);
+
+const featuredPortfolio = portfolio
+  ?.filter((p) => p.featured)
+  ?.slice(0, 3);
+---
 <BaseLayout>
-  <h1>MASK Intelligence</h1>
-  <p>If you see this, your layout works.</p>
+
+  <!-- =========================
+       HERO SECTION
+  ========================== -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <h1>{homepage.hero_title || "Building Intelligent Digital Systems"}</h1>
+
+      <p class="hero-subtitle">
+        {homepage.hero_subtitle ||
+        "We design, engineer, and deploy modern web, AI, and software solutions."}
+      </p>
+
+      {homepage.hero_cta && homepage.hero_cta_link && (
+        <a href={homepage.hero_cta_link} class="btn-primary">
+          {homepage.hero_cta}
+        </a>
+      )}
+    </div>
+
+    {homepage.hero_image && (
+      <div class="hero-image">
+        <img src={homepage.hero_image} alt="Hero Image" />
+      </div>
+    )}
+  </section>
+
+  <!-- =========================
+       SERVICES SECTION
+  ========================== -->
+  {homepage.show_services && (
+    <section class="section services">
+      <div class="container">
+        <h2>Our Services</h2>
+
+        <div class="grid">
+          {featuredServices?.map((service) => (
+            <div class="card">
+              {service.icon && <div class="icon">{service.icon}</div>}
+              <h3>{service.title}</h3>
+              <p>{service.short_description}</p>
+
+              <a href={`/services/${service.slug}`} class="link">
+                Learn More →
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- =========================
+       PORTFOLIO SECTION
+  ========================== -->
+  {homepage.show_portfolio && (
+    <section class="section portfolio">
+      <div class="container">
+        <h2>Featured Work</h2>
+
+        <div class="grid">
+          {featuredPortfolio?.map((project) => (
+            <a
+              href={`/portfolio/${project.slug}`}
+              class="card card-link"
+            >
+              <img
+                src={project.thumbnail}
+                alt={project.title}
+                loading="lazy"
+              />
+              <h3>{project.title}</h3>
+              <p>{project.project_type}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- =========================
+       TESTIMONIALS PLACEHOLDER
+  ========================== -->
+  {homepage.show_testimonials && (
+    <section class="section testimonials">
+      <div class="container">
+        <h2>What Clients Say</h2>
+        <p>Testimonials coming soon.</p>
+      </div>
+    </section>
+  )}
+
 </BaseLayout>
