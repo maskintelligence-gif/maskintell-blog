@@ -1,26 +1,161 @@
 ---
+/* =========================
+   GLOBAL STYLES
+========================= */
 import "../styles/global.css";
+
+/* =========================
+   LOAD CMS SETTINGS
+========================= */
+import general from "../../content/settings/general.json";
+import seo from "../../content/settings/seo.json";
+import analytics from "../../content/settings/analytics.json";
+import gdpr from "../../content/settings/gdpr.json";
+import navigation from "../../content/settings/navigation.json";
+
+/* =========================
+   FALLBACKS
+========================= */
+const siteTitle =
+  general.site_title || "MASK Intelligence";
+
+const siteDescription =
+  general.site_description ||
+  "Engineering intelligent digital systems.";
+
+const metaTitle =
+  seo.default_meta_title || siteTitle;
+
+const metaDescription =
+  seo.default_meta_description || siteDescription;
+
+const metaImage =
+  seo.default_meta_image || "";
+
+const gaId =
+  analytics.google_analytics_id;
 ---
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- =====================
+         CORE META
+    ====================== -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{metaTitle}</title>
+    <meta name="description" content={metaDescription} />
 
-    <slot name="seo" />
+    <!-- =====================
+         SEO / SOCIAL
+    ====================== -->
+    <meta property="og:title" content={metaTitle} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:type" content="website" />
+    {metaImage && <meta property="og:image" content={metaImage} />}
 
-    <!-- GA4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9PMDL2DZJ4"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-9PMDL2DZJ4');
-    </script>
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={metaTitle} />
+    <meta name="twitter:description" content={metaDescription} />
+
+    <!-- =====================
+         ICONS
+    ====================== -->
+    {general.favicon && <link rel="icon" href={general.favicon} />}
+
+    <!-- =====================
+         GOOGLE ANALYTICS (GA4)
+    ====================== -->
+    {gaId && (
+      <>
+        <script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+        ></script>
+        <script>
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${gaId}');
+          `}
+        </script>
+      </>
+    )}
   </head>
 
   <body>
-    <slot />
+    <!-- =====================
+         HEADER / NAVIGATION
+    ====================== -->
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="brand">
+          <a href="/">
+            {general.logo ? (
+              <img src={general.logo} alt={siteTitle} />
+            ) : (
+              <span>{siteTitle}</span>
+            )}
+          </a>
+        </div>
+
+        <nav class="main-nav">
+          <ul>
+            {navigation.main_menu?.map((item) => (
+              <li>
+                <a
+                  href={item.link}
+                  target={item.new_tab ? "_blank" : "_self"}
+                  rel={item.new_tab ? "noopener noreferrer" : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- =====================
+         MAIN CONTENT
+    ====================== -->
+    <main class="site-main">
+      <slot />
+    </main>
+
+    <!-- =====================
+         FOOTER
+    ====================== -->
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>
+          © {new Date().getFullYear()}
+          {" "}
+          {general.company_name || siteTitle}
+        </p>
+
+        <nav class="footer-nav">
+          <ul>
+            {navigation.footer_menu?.map((item) => (
+              <li>
+                <a href={item.link}>{item.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div class="legal">
+          {gdpr.privacy_policy_url && (
+            <a href={gdpr.privacy_policy_url}>Privacy Policy</a>
+          )}
+          {gdpr.terms_of_service_url && (
+            <a href={gdpr.terms_of_service_url}>Terms of Service</a>
+          )}
+        </div>
+      </div>
+    </footer>
   </body>
 </html>
