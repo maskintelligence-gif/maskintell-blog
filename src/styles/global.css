@@ -576,3 +576,18 @@ a:hover {
   cursor: pointer;
   font-weight: 600;
 }
+
+.job-card {
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.job-card .expired {
+  color: #ef4444;
+}
+
+.job-card .closed {
+  color: #9ca3af;
+  font-weight: 600;
+}
