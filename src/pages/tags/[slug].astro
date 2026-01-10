@@ -1,0 +1,30 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getTags, getPostsByTag } from "../../utils/taxonomy";
+
+export async function getStaticPaths() {
+  const tags = await getTags();
+  return tags.map(tag => ({
+    params: { slug: tag.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const posts = await getPostsByTag(slug);
+---
+
+<BaseLayout title={`Tag: ${slug}`}>
+  <h1>Tag: {slug}</h1>
+
+  {posts.length === 0 && <p>No posts found.</p>}
+
+  <ul>
+    {posts.map(post => (
+      <li>
+        <a href={`/blog/${post.slug}`}>
+          {post.data.title}
+        </a>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>
