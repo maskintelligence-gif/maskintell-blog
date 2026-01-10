@@ -1,0 +1,13 @@
+<input
+  type="search"
+  placeholder="Search FAQs…"
+  class="faq-search"
+  oninput="
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.style.display = item.innerText.toLowerCase().includes(q)
+        ? 'block'
+        : 'none';
+    });
+  "
+/>
