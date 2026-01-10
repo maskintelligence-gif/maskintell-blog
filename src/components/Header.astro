@@ -1,0 +1,39 @@
+---
+import { supabase } from "../lib/supabase";
+---
+
+<header class="site-header">
+  <nav>
+    <a href="/">Home</a>
+    <a href="/blog">Blog</a>
+    <a href="/whitepapers">Whitepapers</a>
+
+    <span id="auth-links"></span>
+  </nav>
+
+  <script type="module">
+    import { supabase } from "/src/lib/supabase";
+
+    const container = document.getElementById("auth-links");
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      container.innerHTML = `
+        <a href="/dashboard">Dashboard</a>
+        <button id="logout">Logout</button>
+      `;
+
+      document.getElementById("logout")
+        .addEventListener("click", async () => {
+          await supabase.auth.signOut();
+          window.location.reload();
+        });
+    } else {
+      container.innerHTML = `
+        <a href="/auth/login">Login</a>
+        <a href="/auth/signup">Sign up</a>
+      `;
+    }
+  </script>
+</header>
