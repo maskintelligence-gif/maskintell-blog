@@ -1,0 +1,41 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const entries = await Astro.glob("../../content/testimonials/*.md");
+  return entries.map(entry => ({
+    params: { slug: entry.frontmatter.slug },
+    props: { entry }
+  }));
+}
+
+const { entry } = Astro.props;
+const { name, company, position, body, date, rating } = entry.frontmatter;
+---
+
+<BaseLayout
+  title={`${name} Testimonial`}
+  description={body.slice(0, 150)}
+>
+  <article class="container testimonial-single" itemscope itemtype="https://schema.org/Review">
+    <h1 itemprop="author">{name}</h1>
+
+    {(company || position) && (
+      <p class="meta">
+        {position && <span>{position}</span>}
+        {company && <span> · {company}</span>}
+      </p>
+    )}
+
+    <blockquote itemprop="reviewBody">
+      “{body}”
+    </blockquote>
+
+    <footer>
+      <time datetime={date}>
+        {new Date(date).toLocaleDateString()}
+      </time>
+      <span>⭐ {rating ?? 5}/5</span>
+    </footer>
+  </article>
+</BaseLayout>
