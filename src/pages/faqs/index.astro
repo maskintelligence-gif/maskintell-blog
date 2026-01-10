@@ -1,0 +1,25 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import FAQItem from "../../components/FAQItem.astro";
+
+const faqs = await Astro.glob("../../content/faqs/*.md");
+
+const ordered = faqs
+  .map(f => f.frontmatter)
+  .sort((a, b) => a.order - b.order);
+---
+
+<BaseLayout
+  title="FAQs"
+  description="Frequently asked questions about MASK Intelligence."
+>
+  <section class="container" itemscope itemtype="https://schema.org/FAQPage">
+    <h1>Frequently Asked Questions</h1>
+
+    <div class="faq-list">
+      {ordered.map(faq => (
+        <FAQItem faq={faq} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>
