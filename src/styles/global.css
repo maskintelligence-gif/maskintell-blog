@@ -483,3 +483,31 @@ a:hover {
   display: flex;
   gap: 1rem;
 }
+
+.pill-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.pill {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Category */
+.pill.category {
+  background: var(--primary);
+  color: white;
+}
+
+/* Tag */
+.pill.tag {
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  background: transparent;
+}
