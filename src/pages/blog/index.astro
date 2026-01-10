@@ -1,0 +1,55 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import posts from "../../../content/posts";
+
+/* =========================
+   FILTER & SORT POSTS
+========================= */
+const publishedPosts = posts
+  .filter((post) => post.status === "published")
+  .sort((a, b) => new Date(b.date) - new Date(a.date));
+---
+
+<BaseLayout>
+
+  <section class="section container">
+    <header class="page-header">
+      <h1>Blog</h1>
+      <p class="page-description">
+        Insights, tutorials, and engineering notes from MASK Intelligence.
+      </p>
+    </header>
+
+    <div class="grid">
+      {publishedPosts.map((post) => (
+        <article class="card">
+          {post.thumbnail && (
+            <img
+              src={post.thumbnail}
+              alt={post.image_alt || post.title}
+              loading="lazy"
+            />
+          )}
+
+          <h2>{post.title}</h2>
+
+          {post.excerpt && (
+            <p class="excerpt">{post.excerpt}</p>
+          )}
+
+          <div class="meta">
+            <span>{new Date(post.date).toLocaleDateString()}</span>
+            {post.reading_time > 0 && (
+              <span>· {post.reading_time} min read</span>
+            )}
+          </div>
+
+          <a href={`/blog/${post.slug}`} class="link">
+            Read Article →
+          </a>
+        </article>
+      ))}
+    </div>
+  </section>
+
+</BaseLayout>
